@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Руткиты - Обучение и Игра</title>
+    <style>
+        /* Сброс и базовые стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f0f9ff;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(23, 162, 184, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 90% 30%, rgba(32, 201, 151, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 15% 80%, rgba(0, 180, 216, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 85% 70%, rgba(72, 187, 120, 0.08) 0%, transparent 20%);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2317a2b8' fill-opacity='0.03' fill-rule='evenodd'%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3Ccircle cx='80' cy='160' r='6'/%3E%3Ccircle cx='160' cy='80' r='10'/%3E%3Ccircle cx='120' cy='120' r='4'/%3E%3Ccircle cx='60' cy='20' r='7'/%3E%3Ccircle cx='20' cy='100' r='5'/%3E%3Ccircle cx='180' cy='180' r='9'/%3E%3Ccircle cx='140' cy='60' r='3'/%3E%3C/g%3E%3C/svg%3E");
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            margin-top: 70px;
+        }
+
+        /* Кнопка "Вернуться на главную" - ЛЕВЫЙ ВЕРХНИЙ УГОЛ */
+        .back-to-main {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.2);
+            border: 2px solid transparent;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.3);
+            background: linear-gradient(135deg, #0077e6 0%, #0066cc 100%);
+        }
+
+        /* Шапка */
+        header {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "👁️";
+            position: absolute;
+            font-size: 20rem;
+            opacity: 0.1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Навигация */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            border-color: transparent;
+        }
+
+        /* Основное содержание */
+        .content {
+            padding: 2rem;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Информационный раздел */
+        .info-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #17a2b8;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: #495057;
+            margin: 1.5rem 0 1rem;
+            font-size: 1.3rem;
+        }
+
+        /* Карточки */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h4 {
+            color: #138496;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Списки */
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Тестовый раздел */
+        .test-section {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            border-left: 5px solid #17a2b8;
+        }
+
+        .question {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .option {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 2px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: #138496;
+            background: #f8f9fa;
+        }
+
+        .option.selected {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .option input {
+            margin-right: 10px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+        }
+
+        .button.primary {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-left: 5px solid #28a745;
+            color: #155724;
+        }
+
+        .result.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-left: 5px solid #dc3545;
+            color: #721c24;
+        }
+
+        /* Игровой раздел - НОВЫЙ ДИЗАЙН */
+        .game-section {
+            background: linear-gradient(135deg, #138496, #17a2b8);
+            color: white;
+            border-radius: 10px;
+            padding: 2rem;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* НОВЫЙ ДИЗАЙН: лево-статистика, право-игра */
+        .game-top-row {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .game-top-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Левая колонка: статистика и уровни */
+        .game-stats-sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-stats {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-label {
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-weight: bold;
+        }
+
+        .stat-value.score {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .stat-value.health {
+            color: #4CAF50;
+            font-size: 1.2rem;
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* Правая колонка: игровая карта */
+        .game-map-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 2rem;
+            position: relative;
+            min-height: 400px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-map {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Управление и инвентарь ПОД верхним рядом */
+        .game-bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .game-bottom-row {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        /* Управление */
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .control-btn.action {
+            background: rgba(40, 167, 69, 0.6);
+        }
+
+        .control-btn.action:hover {
+            background: rgba(40, 167, 69, 0.8);
+        }
+
+        /* Инвентарь */
+        .inventory {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .inventory-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1rem;
+            min-height: 60px;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .inventory-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Уровни */
+        .level-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .level-objectives {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .level-objective {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .level-objective.completed {
+            background: rgba(40, 167, 69, 0.3);
+            color: #d4edda;
+        }
+
+        .level-objective.completed::before {
+            content: "✅";
+        }
+
+        /* Кнопка старта */
+        .start-game-btn {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .start-game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Объекты на карте */
+        .map-object {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            border: 3px solid;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .map-object:hover {
+            transform: scale(1.1);
+        }
+
+        .map-object.collected {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0);
+        }
+
+        .map-object.character {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            border-color: white;
+            z-index: 100;
+        }
+
+        .map-object.item {
+            background: linear-gradient(135deg, #2196F3, #0d47a1);
+            color: white;
+            border-color: #bbdefb;
+        }
+
+        .map-object.threat {
+            background: linear-gradient(135deg, #dc3545, #bd2130);
+            color: white;
+            border-color: #ffcdd2;
+        }
+
+        .map-object.exit {
+            background: linear-gradient(135deg, #FFD700, #FF9800);
+            color: white;
+            border-color: #fff9c4;
+        }
+
+        /* Всплывающие сообщения */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
+            min-width: 300px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border-left: 5px solid;
+        }
+
+        .toast.success {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.9);
+        }
+
+        .toast.error {
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.9);
+        }
+
+        .toast.info {
+            border-color: #17a2b8;
+            background: rgba(23, 162, 184, 0.9);
+        }
+
+        .toast.warning {
+            border-color: #ffc107;
+            background: rgba(255, 193, 7, 0.9);
+        }
+
+        /* Диалоги */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .dialog {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .dialog-title {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .dialog-text {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .dialog-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .dialog-option {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-option:hover {
+            background: #138496;
+            transform: translateX(5px);
+        }
+
+        /* Подвал */
+        footer {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 60px;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+            
+            .back-to-main {
+                top: 10px;
+                left: 10px;
+            }
+            
+            .back-button {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-button {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+            
+            .control-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .game-map-container {
+                padding: 1rem;
+                min-height: 350px;
+            }
+            
+            .game-map {
+                height: 350px;
+            }
+            
+            .game-bottom-row {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Кнопка "Вернуться на главную" - ЛЕВЫЙ ВЕРХНИЙ УГОЛ -->
+    <div class="back-to-main">
+        <a href="index.html" class="back-button">← Вернуться на главную</a>
+    </div>
+    
+    <div class="container">
+        <!-- Шапка -->
+        <header>
+            <h1>👁️ Руткиты (Rootkits)</h1>
+            <p class="subtitle">Изучите скрытые угрозы и защитите систему от глубокого внедрения</p>
+            
+            <div class="nav-buttons">
+                <button class="nav-button active" onclick="showSection('info')">
+                    📋 Информация
+                </button>
+                <button class="nav-button" onclick="showSection('test')">
+                    📝 Тест
+                </button>
+                <button class="nav-button" onclick="showSection('game')">
+                    🎮 Игра
+                </button>
+            </div>
+        </header>
+
+        <!-- Основное содержание -->
+        <div class="content">
+            <!-- Информационный раздел -->
+            <section id="infoSection" class="content-section active">
+                <div class="info-section">
+                    <h2>📋 Что такое Руткиты?</h2>
+                    <p><strong>Руткиты (rootkits)</strong> — это набор программных средств, позволяющих злоумышленнику получить постоянный скрытый доступ к компьютерной системе, маскируя свое присутствие от пользователя и системных средств защиты. Название происходит от термина "root" (суперпользователь в Unix-системах) и "kit" (набор инструментов).</p>
+                    
+                    <h3>🎯 Основные функции:</h3>
+                    <ul>
+                        <li>Сокрытие процессов от диспетчера задач</li>
+                        <li>Маскировка файлов и каталогов от пользователя</li>
+                        <li>Перехват системных вызовов для обмана мониторов безопасности</li>
+                        <li>Создание бэкдоров для удаленного доступа</li>
+                        <li>Обход антивирусов, брандмауэров и систем обнаружения вторжений</li>
+                        <li>Кража привилегий администратора</li>
+                        <li>Скрытое наблюдение за действиями пользователя</li>
+                        <li>Установка дополнительного вредоносного ПО</li>
+                    </ul>
+
+                    <h3>📁 Уровни внедрения руткитов:</h3>
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>📱 Уровень приложений</h4>
+                            <p>Самый простой, работает в пользовательских процессах</p>
+                        </div>
+                        <div class="card">
+                            <h4>📚 Библиотечный уровень</h4>
+                            <p>Подмена системных библиотек (DLL, .so)</p>
+                        </div>
+                        <div class="card">
+                            <h4>⚙️ Уровень ядра</h4>
+                            <p>Внедрение в драйверы ядра ОС, самые опасные</p>
+                        </div>
+                        <div class="card">
+                            <h4>🌐 Hypervisor уровень</h4>
+                            <p>Работа ниже операционной системы</p>
+                        </div>
+                        <div class="card">
+                            <h4>💾 Аппаратный уровень</h4>
+                            <p>Внедрение в прошивку или микрокод</p>
+                        </div>
+                        <div class="card">
+                            <h4>🚀 Загрузочный уровень</h4>
+                            <p>Инфекция загрузочного сектора (MBR/VBR)</p>
+                        </div>
+                    </div>
+
+                    <h3>⚠️ Известные примеры руткитов:</h3>
+                    <ul>
+                        <li><strong>Sony BMG Rootkit</strong> — устанавливался с аудио-CD в 2005 году</li>
+                        <li><strong>TDSS/TDL4</strong> — один из самых сложных руткитов уровня ядра</li>
+                        <li><strong>Stuxnet</strong> — сложное кибероружие с руткит-компонентами</li>
+                        <li><strong>Flame</strong> — шпионский комплекс с руткит-компонентами</li>
+                        <li><strong>ZeroAccess</strong> — руткит для создания ботнета и майнинга</li>
+                    </ul>
+
+                    <h3>🛡️ Меры защиты:</h3>
+                    <ol>
+                        <li>Используйте антивирусы с обнаружением руткитов</li>
+                        <li>Проверяйте целостность системных файлов</li>
+                        <li>Загружайтесь с LiveCD для проверки системы</li>
+                        <li>Используйте аппаратные решения (TPM, UEFI Secure Boot)</li>
+                        <li>Регулярно обновляйте систему и драйверы</li>
+                        <li>Мониторьте системные вызовы на аномалии</li>
+                        <li>Проверяйте автозагрузку на подозрительные записи</li>
+                        <li>Используйте только подписанные драйверы</li>
+                    </ol>
+
+                    <div style="background: linear-gradient(135deg, #d1ecf1, #bee5eb); padding: 1.5rem; border-radius: 8px; margin-top: 2rem; border-left: 5px solid #17a2b8;">
+                        <h4>💡 Важно знать:</h4>
+                        <p>Руткиты могут оставаться в системе годами незамеченными. Их основная опасность — в глубокой интеграции в систему и способности скрывать другие вредоносные программы. Для обнаружения сложных руткитов часто требуются специализированные инструменты и загрузка с LiveCD.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Тестовый раздел -->
+            <section id="testSection" class="content-section">
+                <div class="test-section">
+                    <h2>📝 Тест по Руткитам</h2>
+                    <p>Ответьте на вопросы, чтобы проверить свои знания о руткитах.</p>
+                    
+                    <div class="question">
+                        <h3>Вопрос 1: Какая основная особенность руткитов?</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="q1" value="1" onclick="selectOption(this)">
+                                Быстрое распространение по сети для создания ботнетов
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="2" onclick="selectOption(this)">
+                                Шифрование файлов пользователя для требования выкупа
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="3" onclick="selectOption(this)">
+                                Скрытие своего присутствия в операционной системе
+                            </label>
+                        </div>
+                        <button class="button" onclick="checkTestAnswer(1)">✅ Проверить ответ</button>
+                        <div class="result" id="result1"></div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Вопрос 2: Какие из перечисленных мер помогают защититься от руткитов? (Выберите все верные)</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="checkbox" name="q2" value="1" onclick="selectOption(this)">
+                                Регулярно обновлять антивирусные базы
+                            </label>
+                            <label class="option">
+                                <input type="checkbox" name="q2" value="2" onclick="selectOption(this)">
+                                Использовать антируткитные сканеры и специализированные утилиты
+                            </label>
+                            <label class="option">
+                                <input type="checkbox" name="q2" value="3" onclick="selectOption(this)">
+                                Загружаться с LiveCD для проверки системы извне
+                            </label>
+                            <label class="option">
+                                <input type="checkbox" name="q2" value="4" onclick="selectOption(this)">
+                                Проверять цифровые подписи драйверов и системных файлов
+                            </label>
+                        </div>
+                        <button class="button" onclick="checkTestAnswer(2)">✅ Проверить ответ</button>
+                        <div class="result" id="result2"></div>
+                    </div>
+                    
+                    <button class="button primary" onclick="checkAllTestAnswers()">📊 Проверить все ответы</button>
+                </div>
+            </section>
+
+            <!-- Игровой раздел -->
+            <section id="gameSection" class="content-section">
+                <div class="game-section">
+                    <div class="game-header">
+                        <h2>🎮 Обнаружение и нейтрализация Руткитов</h2>
+                        <p>Управляйте специалистом по кибербезопасности и пройдите все 5 уровней!</p>
+                    </div>
+
+                    <!-- ВЕРХНИЙ РЯД: Лево - счетчик уровней и баллы, Право - игра -->
+                    <div class="game-top-row">
+                        <!-- Левая колонка: Счетчик уровней и баллы -->
+                        <div class="game-stats-sidebar">
+                            <div class="level-info">
+                                <h3>Уровень <span id="currentLevel">1</span> из 5</h3>
+                                <p id="levelDescription">Обнаружьте руткиты уровня приложений</p>
+                                
+                                <div class="level-objectives" id="levelObjectives">
+                                    <!-- Задачи уровня будут добавлены здесь -->
+                                </div>
+                            </div>
+
+                            <div class="game-stats">
+                                <div class="stat-row">
+                                    <span class="stat-label">Баллы:</span>
+                                    <span class="stat-value score" id="gameScore">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Целостность системы:</span>
+                                    <span class="stat-value health" id="gameHealth">100%</span>
+                                </div>
+                                <div class="health-bar">
+                                    <div class="health-fill" id="healthBar" style="width: 100%"></div>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Инструменты:</span>
+                                    <span class="stat-value" id="collectedItems">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Осталось руткитов:</span>
+                                    <span class="stat-value" id="remainingThreats">1</span>
+                                </div>
+                            </div>
+
+                            <button class="start-game-btn" onclick="startGame()">
+                                ▶ Начать игру
+                            </button>
+                        </div>
+
+                        <!-- Правая колонка: Игра -->
+                        <div class="game-map-container">
+                            <div class="game-map" id="gameMap">
+                                <!-- Объекты добавляются динамически -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- НИЖНИЙ РЯД: Управление и инвентарь ПОД игрой -->
+                    <div class="game-bottom-row">
+                        <!-- Левая колонка: Управление -->
+                        <div class="controls">
+                            <h4>Управление:</h4>
+                            <div class="control-buttons">
+                                <button class="control-btn" onclick="moveCharacter('up')">↑ Вверх</button>
+                                <button class="control-btn" onclick="moveCharacter('left')">← Влево</button>
+                                <button class="control-btn" onclick="moveCharacter('right')">→ Вправо</button>
+                                <button class="control-btn" onclick="moveCharacter('down')">↓ Вниз</button>
+                                <button class="control-btn action" onclick="useItem()">🛡️ Использовать</button>
+                                <button class="control-btn action" onclick="scanArea()">🔍 Сканировать</button>
+                            </div>
+                        </div>
+
+                        <!-- Правая колонка: Инвентарь -->
+                        <div class="inventory">
+                            <h4>Инвентарь:</h4>
+                            <div class="inventory-items" id="inventory">
+                                <div style="color: rgba(255,255,255,0.6); font-style: italic; width: 100%; text-align: center;">
+                                    Пусто
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Подвал -->
+        <footer>
+            <p>Образовательный проект по кибербезопасности © 2026</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #bdc3c7;">
+                Руткиты — скрытая угроза на уровне операционной системы. Обнаружение требует специальных знаний и инструментов!
+            </p>
+        </footer>
+    </div>
+
+    <!-- Всплывающие сообщения -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Диалоговые окна -->
+    <div class="dialog-overlay" id="dialogOverlay">
+        <div class="dialog">
+            <div class="dialog-title" id="dialogTitle">Обнаружен руткит</div>
+            <div class="dialog-text" id="dialogText"></div>
+            <div class="dialog-options" id="dialogOptions"></div>
+        </div>
+    </div>
+
+    <!-- Миниигры -->
+    <div class="dialog-overlay" id="driverGame">
+        <div class="dialog">
+            <div class="dialog-title">⚙️ Проверка драйвера</div>
+            <div class="dialog-text">Вы обнаружили подозрительный драйвер в системе. Как поступите?</div>
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <strong>Файл: netfilter.sys</strong><br>
+                <small>Путь: C:\Windows\System32\drivers\</small><br>
+                <small>Цифровая подпись: отсутствует</small><br>
+                <small>Дата создания: вчера</small><br>
+                <small>Размер: 248 KB</small>
+            </div>
+            <div class="dialog-options">
+                <button class="dialog-option" onclick="checkDriverChoice('delete')">Удалить драйвер</button>
+                <button class="dialog-option" onclick="checkDriverChoice('quarantine')">Отправить в карантин</button>
+                <button class="dialog-option" onclick="checkDriverChoice('ignore')">Оставить, возможно нужный</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="uefiGame">
+        <div class="dialog">
+            <div class="dialog-title">💾 Проверка прошивки UEFI</div>
+            <div class="dialog-text">Система ведет себя странно после обновления BIOS. Что вы сделаете?</div>
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <strong>Симптомы:</strong><br>
+                <small>• Система медленно загружается</small><br>
+                <small>• В диспетчере задач невидимые процессы</small><br>
+                <small>• Антивирус не запускается</small><br>
+                <small>• BIOS был обновлен неделю назад</small>
+            </div>
+            <div class="dialog-options">
+                <button class="dialog-option" onclick="checkUefiChoice('flash')">Перепрошить UEFI/BIOS</button>
+                <button class="dialog-option" onclick="checkUefiChoice('scan')">Просканировать с LiveCD</button>
+                <button class="dialog-option" onclick="checkUefiChoice('ignore')">Ничего не делать</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+        let currentSection = 'info';
+        let gameActive = false;
+        let gameScore = 0;
+        let gameHealth = 100;
+        let currentLevel = 1;
+        let collectedItems = 0;
+        let inventory = [];
+        let characterPosition = { x: 50, y: 200 };
+        let levelObjects = [];
+        let levelCompleted = false;
+        let testResults = [false, false];
+        let totalLevels = 5;
+
+        // ========== УРОВНИ ИГРЫ ==========
+        const gameLevels = {
+            1: {
+                name: "Руткиты уровня приложений",
+                description: "Обнаружьте и удалите руткиты, работающие в пользовательском режиме",
+                objects: [
+                    { type: 'item', x: 100, y: 100, icon: '🔍', name: 'Антируткитный сканер', id: 'rootkit-scanner' },
+                    { type: 'threat', x: 300, y: 150, icon: '📱', name: 'Руткит уровня приложений', id: 'app-rootkit' },
+                    { type: 'item', x: 200, y: 300, icon: '📊', name: 'Монитор процессов', id: 'process-monitor' },
+                    { type: 'exit', x: 400, y: 350, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'rootkit-scanner', text: 'Установить антируткитный сканер', completed: false },
+                    { id: 'app-rootkit', text: 'Обнаружить руткит уровня приложений', completed: false },
+                    { id: 'process-monitor', text: 'Запустить монитор процессов', completed: false }
+                ],
+                requiredItems: 2,
+                threats: 1
+            },
+            2: {
+                name: "Руткиты уровня ядра",
+                description: "Обнаружьте сложные руткиты, работающие на уровне ядра ОС",
+                objects: [
+                    { type: 'item', x: 150, y: 80, icon: '⚙️', name: 'Проверка драйверов', id: 'driver-check' },
+                    { type: 'threat', x: 350, y: 120, icon: '💀', name: 'Руткит уровня ядра TDSS', id: 'kernel-rootkit' },
+                    { type: 'item', x: 100, y: 250, icon: '🔒', name: 'Политика подписанных драйверов', id: 'signed-drivers' },
+                    { type: 'threat', x: 300, y: 280, icon: '👁️', name: 'Скрытый драйвер руткита', id: 'hidden-driver' },
+                    { type: 'exit', x: 400, y: 180, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'driver-check', text: 'Проверить драйверы на подписи', completed: false },
+                    { id: 'kernel-rootkit', text: 'Обнаружить руткит уровня ядра', completed: false },
+                    { id: 'signed-drivers', text: 'Включить политику подписанных драйверов', completed: false }
+                ],
+                requiredItems: 2,
+                threats: 2
+            },
+            3: {
+                name: "Загрузочные руткиты",
+                description: "Обнаружьте и удалите руткиты в загрузочном секторе",
+                objects: [
+                    { type: 'item', x: 80, y: 120, icon: '🚀', name: 'Проверка MBR/VBR', id: 'mbr-check' },
+                    { type: 'threat', x: 250, y: 100, icon: '💾', name: 'Руткит в загрузочном секторе', id: 'boot-rootkit' },
+                    { type: 'item', x: 350, y: 200, icon: '🔄', name: 'Восстановление загрузчика', id: 'boot-repair' },
+                    { type: 'threat', x: 150, y: 300, icon: '⚠️', name: 'Поврежденный MBR', id: 'corrupted-mbr' },
+                    { type: 'threat', x: 320, y: 320, icon: '👁️', name: 'Скрытый код в VBR', id: 'vbr-rootkit' },
+                    { type: 'exit', x: 400, y: 50, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'mbr-check', text: 'Проверить целостность MBR', completed: false },
+                    { id: 'boot-rootkit', text: 'Обнаружить загрузочный руткит', completed: false },
+                    { id: 'boot-repair', text: 'Восстановить загрузчик', completed: false },
+                    { id: 'vbr-rootkit', text: 'Обнаружить руткит в VBR', completed: false }
+                ],
+                requiredItems: 3,
+                threats: 3
+            },
+            4: {
+                name: "UEFI/BIOS руткиты",
+                description: "Обнаружьте руткиты в прошивке UEFI/BIOS",
+                objects: [
+                    { type: 'item', x: 100, y: 180, icon: '💻', name: 'Проверка целостности UEFI', id: 'uefi-check' },
+                    { type: 'threat', x: 280, y: 140, icon: '🕵️', name: 'UEFI руткит Hacking Team', id: 'uefi-rootkit' },
+                    { type: 'item', x: 180, y: 280, icon: '🔐', name: 'Secure Boot активация', id: 'secure-boot' },
+                    { type: 'threat', x: 380, y: 220, icon: '⚠️', name: 'Модифицированная прошивка', id: 'modified-firmware' },
+                    { type: 'item', x: 320, y: 320, icon: '🔄', name: 'Перепрошивка BIOS', id: 'bios-flash' },
+                    { type: 'exit', x: 50, y: 50, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'uefi-check', text: 'Проверить целостность UEFI', completed: false },
+                    { id: 'uefi-rootkit', text: 'Обнаружить UEFI руткит', completed: false },
+                    { id: 'secure-boot', text: 'Активировать Secure Boot', completed: false },
+                    { id: 'modified-firmware', text: 'Обнаружить модифицированную прошивку', completed: false }
+                ],
+                requiredItems: 3,
+                threats: 3
+            },
+            5: {
+                name: "Сложные комплексные руткиты",
+                description: "Обнаружьте современные сложные руткиты с несколькими уровнями",
+                objects: [
+                    { type: 'item', x: 120, y: 100, icon: '🤖', name: 'AI-система обнаружения руткитов', id: 'ai-detection' },
+                    { type: 'threat', x: 280, y: 80, icon: '🔥', name: 'Комплексный руткит Stuxnet', id: 'stuxnet' },
+                    { type: 'item', x: 180, y: 200, icon: '🎯', name: 'Поведенческий анализ', id: 'behavior-analysis' },
+                    { type: 'threat', x: 350, y: 180, icon: '🏠', name: 'Аппаратный руткит', id: 'hardware-rootkit' },
+                    { type: 'item', x: 250, y: 300, icon: '🎓', name: 'Обучение сотрудников', id: 'training' },
+                    { type: 'threat', x: 100, y: 350, icon: '🌐', name: 'Кросс-платформенный руткит', id: 'crossplatform-rootkit' },
+                    { type: 'exit', x: 400, y: 350, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'ai-detection', text: 'Включить AI-обнаружение руткитов', completed: false },
+                    { id: 'stuxnet', text: 'Обнаружить сложный руткит Stuxnet', completed: false },
+                    { id: 'behavior-analysis', text: 'Настроить поведенческий анализ', completed: false },
+                    { id: 'hardware-rootkit', text: 'Обнаружить аппаратный руткит', completed: false },
+                    { id: 'crossplatform-rootkit', text: 'Обнаружить кросс-платформенный руткит', completed: false }
+                ],
+                requiredItems: 4,
+                threats: 3
+            }
+        };
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('info');
+            setupKeyboardControls();
+            initGame();
+        });
+
+        // ========== ПЕРЕКЛЮЧЕНИЕ РАЗДЕЛОВ ==========
+        function showSection(section) {
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(section + 'Section').classList.add('active');
+            document.querySelector(`.nav-button[onclick="showSection('${section}')"]`).classList.add('active');
+            
+            currentSection = section;
+            
+            if (section === 'game' && !gameActive) {
+                initGame();
+            }
+        }
+
+        // ========== ТЕСТОВЫЙ РЕЖИМ ==========
+        function selectOption(element) {
+            const options = element.closest('.options').querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            if (element.checked) {
+                element.closest('.option').classList.add('selected');
+            }
+        }
+
+        function checkTestAnswer(questionNum) {
+            const resultElement = document.getElementById(`result${questionNum}`);
+            
+            if (questionNum === 1) {
+                const selected = document.querySelector('input[name="q1"]:checked');
+                if (!selected) {
+                    showTestResult(resultElement, "❌ Пожалуйста, выберите ответ", false);
+                    return;
+                }
+                
+                if (selected.value === "3") {
+                    showTestResult(resultElement, "✅ Правильно! Основная особенность руткитов — скрытие своего присутствия в операционной системе.", true);
+                    testResults[0] = true;
+                } else {
+                    showTestResult(resultElement, "❌ Неверно. Правильный ответ: скрытие своего присутствия в операционной системе.", false);
+                }
+            } 
+            else if (questionNum === 2) {
+                const checkboxes = document.querySelectorAll('input[name="q2"]:checked');
+                const values = Array.from(checkboxes).map(cb => cb.value);
+                
+                if (values.length === 0) {
+                    showTestResult(resultElement, "❌ Пожалуйста, выберите варианты", false);
+                    return;
+                }
+                
+                const correctValues = ["2", "3", "4"];
+                const isCorrect = values.length === 3 && 
+                                 values.includes("2") && 
+                                 values.includes("3") && 
+                                 values.includes("4");
+                
+                if (isCorrect) {
+                    showTestResult(resultElement, "✅ Отлично! Вы выбрали все правильные меры защиты от руткитов.", true);
+                    testResults[1] = true;
+                } else {
+                    showTestResult(resultElement, "❌ Не все ответы верны. Правильные меры: использовать антируткитные сканеры, загружаться с LiveCD, проверять цифровые подписи.", false);
+                }
+            }
+        }
+
+        function showTestResult(element, message, isCorrect) {
+            element.textContent = message;
+            element.className = isCorrect ? "result correct" : "result incorrect";
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function checkAllTestAnswers() {
+            checkTestAnswer(1);
+            checkTestAnswer(2);
+            
+            setTimeout(() => {
+                const allCorrect = testResults.every(answer => answer === true);
+                if (allCorrect) {
+                    showToast("🎉 Поздравляем! Вы успешно прошли тест по руткитам!", 'success');
+                } else {
+                    showToast("📚 Некоторые ответы неверны. Изучите материал еще раз!", 'warning');
+                }
+            }, 1000);
+        }
+
+        // ========== ИГРОВОЙ РЕЖИМ ==========
+        function initGame() {
+            gameActive = false;
+            gameScore = 0;
+            gameHealth = 100;
+            currentLevel = 1;
+            collectedItems = 0;
+            inventory = [];
+            characterPosition = { x: 50, y: 200 };
+            
+            loadLevel(currentLevel);
+            updateGameUI();
+        }
+
+        function startGame() {
+            if (!gameActive) {
+                gameActive = true;
+                updateGameUI();
+                showToast("🎮 Игра началась! Обнаружьте и нейтрализуйте все руткиты в системе.", 'success');
+            }
+        }
+
+        function loadLevel(levelNum) {
+            if (levelNum > totalLevels) {
+                completeGame();
+                return;
+            }
+            
+            currentLevel = levelNum;
+            levelCompleted = false;
+            const level = gameLevels[levelNum];
+            
+            document.getElementById('currentLevel').textContent = levelNum;
+            document.getElementById('levelDescription').textContent = level.description;
+            
+            const objectivesList = document.getElementById('levelObjectives');
+            objectivesList.innerHTML = '';
+            level.objectives.forEach(obj => {
+                const li = document.createElement('li');
+                li.className = 'level-objective';
+                li.id = `objective-${obj.id}`;
+                li.textContent = obj.text;
+                objectivesList.appendChild(li);
+            });
+            
+            const gameMap = document.getElementById('gameMap');
+            gameMap.innerHTML = '';
+            
+            const character = document.createElement('div');
+            character.className = 'map-object character';
+            character.id = 'character';
+            character.style.left = characterPosition.x + 'px';
+            character.style.top = characterPosition.y + 'px';
+            character.textContent = '👨‍💻';
+            character.title = 'Специалист по кибербезопасности';
+            gameMap.appendChild(character);
+            
+            levelObjects = [];
+            level.objects.forEach(obj => {
+                const element = document.createElement('div');
+                element.className = `map-object ${obj.type}`;
+                element.id = `obj-${obj.id}`;
+                element.style.left = obj.x + 'px';
+                element.style.top = obj.y + 'px';
+                element.textContent = obj.icon;
+                element.title = obj.name;
+                element.dataset.type = obj.type;
+                element.dataset.id = obj.id;
+                element.dataset.name = obj.name;
+                gameMap.appendChild(element);
+                
+                levelObjects.push({
+                    element: element,
+                    ...obj,
+                    collected: false
+                });
+            });
+            
+            updateRemainingThreats();
+        }
+
+        function moveCharacter(direction) {
+            if (!gameActive || levelCompleted) return;
+            
+            const step = 30;
+            const character = document.getElementById('character');
+            
+            switch(direction) {
+                case 'up':
+                    if (characterPosition.y - step >= 20) characterPosition.y -= step;
+                    break;
+                case 'down':
+                    if (characterPosition.y + step <= 370) characterPosition.y += step;
+                    break;
+                case 'left':
+                    if (characterPosition.x - step >= 20) characterPosition.x -= step;
+                    break;
+                case 'right':
+                    if (characterPosition.x + step <= 450) characterPosition.x += step;
+                    break;
+            }
+            
+            character.style.left = characterPosition.x + 'px';
+            character.style.top = characterPosition.y + 'px';
+            
+            checkCollisions();
+            gameScore += 5;
+            updateGameUI();
+        }
+
+        function checkCollisions() {
+            levelObjects.forEach(obj => {
+                if (obj.collected) return;
+                
+                const objRect = {
+                    x: parseInt(obj.element.style.left),
+                    y: parseInt(obj.element.style.top),
+                    width: 60,
+                    height: 60
+                };
+                
+                const charRect = {
+                    x: characterPosition.x,
+                    y: characterPosition.y,
+                    width: 60,
+                    height: 60
+                };
+                
+                if (isColliding(charRect, objRect)) {
+                    interactWithObject(obj);
+                }
+            });
+        }
+
+        function isColliding(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        function interactWithObject(obj) {
+            if (!gameActive || obj.collected || levelCompleted) return;
+            
+            switch(obj.type) {
+                case 'item':
+                    collectItem(obj);
+                    break;
+                case 'threat':
+                    handleThreat(obj);
+                    break;
+                case 'exit':
+                    tryExitLevel();
+                    break;
+            }
+        }
+
+        function collectItem(obj) {
+            obj.collected = true;
+            obj.element.classList.add('collected');
+            collectedItems++;
+            inventory.push(obj.name);
+            gameScore += 100;
+            
+            const objective = document.getElementById(`objective-${obj.id}`);
+            if (objective) {
+                objective.classList.add('completed');
+            }
+            
+            updateInventory();
+            updateGameUI();
+            showToast(`✅ Собрано: ${obj.name}! +100 баллов`, 'success');
+            
+            const level = gameLevels[currentLevel];
+            const collectedRequiredItems = levelObjects.filter(o => o.type === 'item' && o.collected).length;
+            if (collectedRequiredItems >= level.requiredItems) {
+                showToast("🎯 Достаточно инструментов собрано! Можно идти к выходу.", 'info');
+            }
+        }
+
+        function handleThreat(obj) {
+            if (obj.id === 'kernel-rootkit' || obj.id === 'hidden-driver') {
+                showDriverGame(obj);
+            } else if (obj.id === 'uefi-rootkit' || obj.id === 'modified-firmware') {
+                showUefiGame(obj);
+            } else {
+                showThreatDialog(obj);
+            }
+        }
+
+        function showThreatDialog(obj) {
+            showDialog(
+                `Обнаружен руткит: ${obj.name}`,
+                getThreatDescription(obj.id),
+                [
+                    { 
+                        text: 'Нейтрализовать с помощью антируткитного сканера', 
+                        action: () => neutralizeThreat(obj) 
+                    },
+                    { 
+                        text: 'Проигнорировать, это ложное срабатывание', 
+                        action: () => takeDamage(30) 
+                    }
+                ]
+            );
+        }
+
+        function getThreatDescription(threatId) {
+            const descriptions = {
+                'app-rootkit': 'Руткит уровня приложений. Скрывает процессы и файлы, подменяет библиотеки.',
+                'kernel-rootkit': 'Руткит уровня ядра TDSS. Внедрен в драйверы ядра, манипулирует системными структурами.',
+                'hidden-driver': 'Скрытый драйвер руткита. Не отображается в стандартных списках драйверов.',
+                'boot-rootkit': 'Руткит в загрузочном секторе MBR. Активируется до загрузки ОС.',
+                'corrupted-mbr': 'Поврежденный MBR с внедренным кодом руткита.',
+                'vbr-rootkit': 'Руткит в Volume Boot Record. Скрывается в загрузочной записи раздела.',
+                'uefi-rootkit': 'UEFI руткит Hacking Team. Внедрен в прошивку, сохраняется при переустановке ОС.',
+                'modified-firmware': 'Модифицированная прошивка с руткит-компонентами.',
+                'stuxnet': 'Комплексный руткит Stuxnet. Использует несколько уязвимостей нулевого дня.',
+                'hardware-rootkit': 'Аппаратный руткит. Внедрен в микрокод процессора или контроллеры.',
+                'crossplatform-rootkit': 'Кросс-платформенный руткит. Работает на разных ОС и архитектурах.'
+            };
+            
+            return descriptions[threatId] || 'Неизвестный руткит. Может скрывать свое присутствие и контролировать систему.';
+        }
+
+        function neutralizeThreat(obj) {
+            obj.collected = true;
+            obj.element.classList.add('collected');
+            gameScore += 150;
+            
+            const objective = document.getElementById(`objective-${obj.id}`);
+            if (objective) {
+                objective.classList.add('completed');
+            }
+            
+            updateRemainingThreats();
+            updateGameUI();
+            showToast(`✅ Руткит "${obj.name}" нейтрализован! +150 баллов`, 'success');
+        }
+
+        function tryExitLevel() {
+            const level = gameLevels[currentLevel];
+            const collectedRequiredItems = levelObjects.filter(o => o.type === 'item' && o.collected).length;
+            const remainingThreats = levelObjects.filter(o => o.type === 'threat' && !o.collected).length;
+            
+            if (collectedRequiredItems >= level.requiredItems && remainingThreats === 0) {
+                completeLevel();
+            } else {
+                let message = "❌ Нельзя покинуть уровень!\n";
+                if (collectedRequiredItems < level.requiredItems) {
+                    message += `Нужно собрать еще ${level.requiredItems - collectedRequiredItems} инструментов защиты\n`;
+                }
+                if (remainingThreats > 0) {
+                    message += `Осталось нейтрализовать ${remainingThreats} руткитов`;
+                }
+                showToast(message, 'error');
+            }
+        }
+
+        function completeLevel() {
+            levelCompleted = true;
+            const bonus = 500 + (gameHealth * 5);
+            gameScore += bonus;
+            
+            showDialog(
+                "🎉 Уровень пройден!",
+                `Вы успешно защитили систему от руткитов на уровне ${currentLevel}!\n\n` +
+                `Бонусные баллы: +${bonus}\n` +
+                `Общий счет: ${gameScore}\n\n` +
+                `Готовы к следующему уровню?`,
+                [
+                    { 
+                        text: 'Следующий уровень', 
+                        action: () => {
+                            currentLevel++;
+                            loadLevel(currentLevel);
+                            hideDialog();
+                            showToast(`🎮 Начался уровень ${currentLevel}!`, 'success');
+                        } 
+                    },
+                    { 
+                        text: 'Завершить игру', 
+                        action: () => {
+                            hideDialog();
+                            showToast(`🎮 Игра завершена! Ваш счет: ${gameScore}`, 'success');
+                        } 
+                    }
+                ]
+            );
+            
+            updateGameUI();
+        }
+
+        function completeGame() {
+            gameActive = false;
+            showDialog(
+                "🏆 Игра пройдена!",
+                `Поздравляем! Вы прошли все 5 уровней борьбы с руткитами!\n\n` +
+                `Итоговый счет: ${gameScore}\n` +
+                `Собрано инструментов защиты: ${collectedItems}\n` +
+                `Система полностью защищена от руткитов!`,
+                [
+                    { 
+                        text: 'Начать заново', 
+                        action: () => {
+                            hideDialog();
+                            initGame();
+                            startGame();
+                        } 
+                    },
+                    { 
+                        text: 'Выйти в меню', 
+                        action: () => {
+                            hideDialog();
+                            showSection('info');
+                        } 
+                    }
+                ]
+            );
+        }
+
+        function useItem() {
+            if (!gameActive || inventory.length === 0) {
+                showToast("❌ В инвентаре нет инструментов для использования", 'error');
+                return;
+            }
+            
+            const item = inventory.pop();
+            gameHealth = Math.min(100, gameHealth + 25);
+            gameScore += 50;
+            updateInventory();
+            updateGameUI();
+            showToast(`🛡️ Использовано: ${item}. Целостность системы восстановлена на 25%`, 'success');
+        }
+
+        function scanArea() {
+            if (!gameActive) return;
+            
+            gameScore += 20;
+            const nearbyItems = levelObjects.filter(obj => 
+                !obj.collected && 
+                obj.type === 'item' && 
+                Math.abs(characterPosition.x - obj.x) < 100 &&
+                Math.abs(characterPosition.y - obj.y) < 100
+            ).length;
+            
+            const nearbyThreats = levelObjects.filter(obj => 
+                !obj.collected && 
+                obj.type === 'threat' && 
+                Math.abs(characterPosition.x - obj.x) < 100 &&
+                Math.abs(characterPosition.y - obj.y) < 100
+            ).length;
+            
+            showToast(`🔍 Сканирование... Найдено: ${nearbyItems} инструментов, ${nearbyThreats} руткитов поблизости`, 'info');
+            updateGameUI();
+        }
+
+        function takeDamage(amount) {
+            gameHealth = Math.max(0, gameHealth - amount);
+            
+            if (gameHealth <= 0) {
+                gameOver();
+            } else {
+                showToast(`💥 Руткит повредил систему! Целостность уменьшена на ${amount}%`, 'error');
+                updateGameUI();
+            }
+        }
+
+        function gameOver() {
+            gameActive = false;
+            showDialog(
+                "💀 Система скомпрометирована!",
+                "Руткиты получили полный контроль над системой. Ваши данные украдены, система повреждена.",
+                [
+                    { 
+                        text: 'Начать заново', 
+                        action: () => {
+                            hideDialog();
+                            initGame();
+                            startGame();
+                        } 
+                    },
+                    { 
+                        text: 'Выйти в меню', 
+                        action: () => {
+                            hideDialog();
+                            showSection('info');
+                        } 
+                    }
+                ]
+            );
+        }
+
+        // ========== МИНИ-ИГРЫ ==========
+        function showDriverGame(obj) {
+            document.getElementById('driverGame').dataset.threatId = obj.id;
+            document.getElementById('driverGame').style.display = 'flex';
+        }
+
+        function checkDriverChoice(choice) {
+            const threatId = document.getElementById('driverGame').dataset.threatId;
+            document.getElementById('driverGame').style.display = 'none';
+            
+            if (choice === 'delete' || choice === 'quarantine') {
+                gameScore += 200;
+                showToast("✅ Правильный выбор! Вы обезвредили опасный драйвер руткита. +200 баллов", 'success');
+                
+                const threatObj = levelObjects.find(obj => obj.id === threatId);
+                if (threatObj) {
+                    threatObj.collected = true;
+                    threatObj.element.classList.add('collected');
+                    
+                    const objective = document.getElementById(`objective-${threatId}`);
+                    if (objective) {
+                        objective.classList.add('completed');
+                    }
+                    
+                    updateRemainingThreats();
+                }
+            } else {
+                takeDamage(40);
+                showToast("❌ Опасность! Вы оставили драйвер руткита в системе. Руткит получил контроль.", 'error');
+            }
+            
+            updateGameUI();
+        }
+
+        function showUefiGame(obj) {
+            document.getElementById('uefiGame').dataset.threatId = obj.id;
+            document.getElementById('uefiGame').style.display = 'flex';
+        }
+
+        function checkUefiChoice(choice) {
+            const threatId = document.getElementById('uefiGame').dataset.threatId;
+            document.getElementById('uefiGame').style.display = 'none';
+            
+            if (choice === 'flash' || choice === 'scan') {
+                gameScore += 180;
+                showToast("✅ Правильно! Вы приняли меры против UEFI руткита. +180 баллов", 'success');
+                
+                const threatObj = levelObjects.find(obj => obj.id === threatId);
+                if (threatObj) {
+                    threatObj.collected = true;
+                    threatObj.element.classList.add('collected');
+                    
+                    const objective = document.getElementById(`objective-${threatId}`);
+                    if (objective) {
+                        objective.classList.add('completed');
+                    }
+                    
+                    updateRemainingThreats();
+                }
+            } else {
+                takeDamage(35);
+                showToast("❌ Опасность! UEFI руткит остался в прошивке. Система полностью скомпрометирована.", 'error');
+            }
+            
+            updateGameUI();
+        }
+
+        // ========== ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ==========
+        function updateGameUI() {
+            document.getElementById('gameScore').textContent = gameScore;
+            document.getElementById('gameHealth').textContent = gameHealth + '%';
+            document.getElementById('healthBar').style.width = gameHealth + '%';
+            document.getElementById('collectedItems').textContent = collectedItems;
+            
+            const healthBar = document.getElementById('healthBar');
+            if (gameHealth > 70) {
+                healthBar.style.background = 'linear-gradient(90deg, #4CAF50, #2E7D32)';
+            } else if (gameHealth > 30) {
+                healthBar.style.background = 'linear-gradient(90deg, #ff9800, #ff5722)';
+            } else {
+                healthBar.style.background = 'linear-gradient(90deg, #f44336, #d32f2f)';
+            }
+        }
+
+        function updateRemainingThreats() {
+            const remaining = levelObjects.filter(obj => obj.type === 'threat' && !obj.collected).length;
+            document.getElementById('remainingThreats').textContent = remaining;
+        }
+
+        function updateInventory() {
+            const inventoryEl = document.getElementById('inventory');
+            inventoryEl.innerHTML = '';
+            
+            if (inventory.length === 0) {
+                inventoryEl.innerHTML = '<div style="color: rgba(255,255,255,0.6); font-style: italic; width: 100%; text-align: center;">Пусто</div>';
+            } else {
+                inventory.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'inventory-item';
+                    itemEl.textContent = item;
+                    inventoryEl.appendChild(itemEl);
+                });
+            }
+        }
+
+        // ========== ВСПЛЫВАЮЩИЕ СООБЩЕНИЯ ==========
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // ========== ДИАЛОГОВЫЕ ФУНКЦИИ ==========
+        function showDialog(title, text, options) {
+            document.getElementById('dialogTitle').textContent = title;
+            document.getElementById('dialogText').textContent = text;
+            
+            const optionsContainer = document.getElementById('dialogOptions');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'dialog-option';
+                button.textContent = option.text;
+                button.onclick = () => {
+                    option.action();
+                    hideDialog();
+                };
+                optionsContainer.appendChild(button);
+            });
+            
+            document.getElementById('dialogOverlay').style.display = 'flex';
+        }
+
+        function hideDialog() {
+            document.getElementById('dialogOverlay').style.display = 'none';
+            document.getElementById('driverGame').style.display = 'none';
+            document.getElementById('uefiGame').style.display = 'none';
+        }
+
+        // ========== УПРАВЛЕНИЕ С КЛАВИАТУРЫ ==========
+        function setupKeyboardControls() {
+            document.addEventListener('keydown', function(e) {
+                if (!gameActive || currentSection !== 'game') return;
+                
+                switch(e.key.toLowerCase()) {
+                    case 'arrowup':
+                    case 'w':
+                        e.preventDefault();
+                        moveCharacter('up');
+                        break;
+                    case 'arrowleft':
+                    case 'a':
+                        e.preventDefault();
+                        moveCharacter('left');
+                        break;
+                    case 'arrowright':
+                    case 'd':
+                        e.preventDefault();
+                        moveCharacter('right');
+                        break;
+                    case 'arrowdown':
+                    case 's':
+                        e.preventDefault();
+                        moveCharacter('down');
+                        break;
+                    case ' ':
+                        e.preventDefault();
+                        useItem();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        scanArea();
+                        break;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

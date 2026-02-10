@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шпионское ПО - Обучение и Игра</title>
+    <style>
+        /* Сброс и базовые стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f0f9ff;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 193, 7, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 90% 30%, rgba(224, 168, 0, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 15% 80%, rgba(255, 235, 59, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 85% 70%, rgba(224, 168, 0, 0.08) 0%, transparent 20%);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffc107' fill-opacity='0.03' fill-rule='evenodd'%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3Ccircle cx='80' cy='160' r='6'/%3E%3Ccircle cx='160' cy='80' r='10'/%3E%3Ccircle cx='120' cy='120' r='4'/%3E%3Ccircle cx='60' cy='20' r='7'/%3E%3Ccircle cx='20' cy='100' r='5'/%3E%3Ccircle cx='180' cy='180' r='9'/%3E%3Ccircle cx='140' cy='60' r='3'/%3E%3C/g%3E%3C/svg%3E");
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            margin-top: 70px; /* Отступ для кнопки */
+        }
+
+        /* Кнопка "Вернуться на главную" - ЛЕВЫЙ ВЕРХНИЙ УГОЛ */
+        .back-to-main {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+            border: 2px solid transparent;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+            background: linear-gradient(135deg, #ffca28 0%, #ffc107 100%);
+        }
+
+        /* Шапка */
+        header {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "🕵️";
+            position: absolute;
+            font-size: 20rem;
+            opacity: 0.1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Навигация */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: #212529;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            border-color: transparent;
+            color: white;
+        }
+
+        /* Основное содержание */
+        .content {
+            padding: 2rem;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Информационный раздел */
+        .info-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #ffc107;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: #495057;
+            margin: 1.5rem 0 1rem;
+            font-size: 1.3rem;
+        }
+
+        /* Карточки */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #ffc107;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h4 {
+            color: #e0a800;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Списки */
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Тестовый раздел */
+        .test-section {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-left: 5px solid #ffc107;
+        }
+
+        .question {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #ffc107;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .option {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 2px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: #e0a800;
+            background: #f8f9fa;
+        }
+
+        .option.selected {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .option input {
+            margin-right: 10px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+
+        .button.primary {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result.correct {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-left: 5px solid #28a745;
+            color: #155724;
+        }
+
+        .result.incorrect {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            border-left: 5px solid #dc3545;
+            color: #721c24;
+        }
+
+        /* Игровой раздел - ТОЧНО ТАК КАК У ТРОЯНОВ */
+        .game-section {
+            background: linear-gradient(135deg, #e0a800, #ffc107);
+            color: #212529;
+            border-radius: 10px;
+            padding: 2rem;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* ТОЧНО ТАКАЯ ЖЕ СТРУКТУРА: лево-статистика, право-игра */
+        .game-top-row {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .game-top-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Левая колонка: статистика и уровни */
+        .game-stats-sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-stats {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            color: white;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: white;
+        }
+
+        .stat-value.score {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .stat-value.health {
+            color: #4CAF50;
+            font-size: 1.2rem;
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* Правая колонка: игровая карта */
+        .game-map-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 2rem;
+            position: relative;
+            min-height: 400px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-map {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Управление и инвентарь ПОД верхним рядом */
+        .game-bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .game-bottom-row {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        /* Управление */
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: #212529;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .control-btn.action {
+            background: rgba(40, 167, 69, 0.6);
+            color: white;
+        }
+
+        .control-btn.action:hover {
+            background: rgba(40, 167, 69, 0.8);
+        }
+
+        /* Инвентарь */
+        .inventory {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .inventory-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1rem;
+            min-height: 60px;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .inventory-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Уровни */
+        .level-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .level-objectives {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .level-objective {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .level-objective.completed {
+            background: rgba(40, 167, 69, 0.3);
+            color: #d4edda;
+        }
+
+        .level-objective.completed::before {
+            content: "✅";
+        }
+
+        /* Кнопка старта */
+        .start-game-btn {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .start-game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Объекты на карте */
+        .map-object {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            border: 3px solid;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .map-object:hover {
+            transform: scale(1.1);
+        }
+
+        .map-object.collected {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0);
+        }
+
+        .map-object.character {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            border-color: white;
+            z-index: 100;
+        }
+
+        .map-object.item {
+            background: linear-gradient(135deg, #2196F3, #0d47a1);
+            color: white;
+            border-color: #bbdefb;
+        }
+
+        .map-object.threat {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+            border-color: #fff59d;
+        }
+
+        .map-object.exit {
+            background: linear-gradient(135deg, #FFD700, #FF9800);
+            color: #212529;
+            border-color: #fff9c4;
+        }
+
+        /* Всплывающие сообщения */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
+            min-width: 300px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border-left: 5px solid;
+        }
+
+        .toast.success {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.9);
+        }
+
+        .toast.error {
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.9);
+        }
+
+        .toast.info {
+            border-color: #17a2b8;
+            background: rgba(23, 162, 184, 0.9);
+        }
+
+        .toast.warning {
+            border-color: #ffc107;
+            background: rgba(255, 193, 7, 0.9);
+        }
+
+        /* Диалоги */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .dialog {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .dialog-title {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .dialog-text {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .dialog-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .dialog-option {
+            background: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-option:hover {
+            background: #e0a800;
+            transform: translateX(5px);
+        }
+
+        /* Подвал */
+        footer {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 60px;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+            
+            .back-to-main {
+                top: 10px;
+                left: 10px;
+            }
+            
+            .back-button {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-button {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+            
+            .control-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .game-map-container {
+                padding: 1rem;
+                min-height: 350px;
+            }
+            
+            .game-map {
+                height: 350px;
+            }
+            
+            .game-bottom-row {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Кнопка "Вернуться на главную" - ЛЕВЫЙ ВЕРХНИЙ УГОЛ -->
+    <div class="back-to-main">
+        <a href="index.html" class="back-button">← Вернуться на главную</a>
+    </div>
+    
+    <div class="container">
+        <!-- Шапка -->
+        <header>
+            <h1>🕵️ Шпионское ПО (Spyware)</h1>
+            <p class="subtitle">Изучите угрозы приватности и защитите свои данные в увлекательной игре</p>
+            
+            <div class="nav-buttons">
+                <button class="nav-button active" onclick="showSection('info')">
+                    📋 Информация
+                </button>
+                <button class="nav-button" onclick="showSection('test')">
+                    📝 Тест
+                </button>
+                <button class="nav-button" onclick="showSection('game')">
+                    🎮 Игра
+                </button>
+            </div>
+        </header>
+
+        <!-- Основное содержание -->
+        <div class="content">
+            <!-- Информационный раздел -->
+            <section id="infoSection" class="content-section active">
+                <div class="info-section">
+                    <h2>📋 Что такое Шпионское ПО?</h2>
+                    <p><strong>Шпионское ПО (spyware)</strong> — это тип вредоносного программного обеспечения, которое тайно собирает информацию о пользователе, его действиях на компьютере и передает эти данные третьим лицам без согласия пользователя. В отличие от других типов вирусов, spyware редко наносит прямой вред системе, но нарушает конфиденциальность и может использоваться для кражи личных данных, финансового мошенничества и шпионажа.</p>
+                    
+                    <h3>🎯 Основные функции:</h3>
+                    <ul>
+                        <li>Кейлоггинг — запись всех нажатий клавиш для кражи паролей и информации</li>
+                        <li>Мониторинг браузера — отслеживание истории посещений и поисковых запросов</li>
+                        <li>Скриншотинг — периодическое создание снимков экрана</li>
+                        <li>Запись аудио и видео через микрофон и веб-камеру</li>
+                        <li>Кража файлов и документов с компьютера</li>
+                        <li>Мониторинг электронной почты и сообщений</li>
+                        <li>Сбор системной информации и данных об оборудовании</li>
+                        <li>Геолокация — отслеживание местоположения пользователя</li>
+                        <li>Банковский мониторинг — перехват банковских данных</li>
+                    </ul>
+
+                    <h3>📁 Пути заражения:</h3>
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>📦 Бесплатное ПО</h4>
+                            <p>Spyware часто поставляется в комплекте с бесплатными программами, когда пользователи соглашаются на установку, не читая лицензионное соглашение</p>
+                        </div>
+                        <div class="card">
+                            <h4>🌐 Вредоносные сайты</h4>
+                            <p>Drive-by downloads — загрузка и установка spyware при посещении зараженного сайта через уязвимости в браузере</p>
+                        </div>
+                        <div class="card">
+                            <h4>📧 Фишинговые письма</h4>
+                            <p>Вложения и ссылки в письмах, маскирующихся под важные документы или официальные уведомления</p>
+                        </div>
+                        <div class="card">
+                            <h4>📱 Мобильные приложения</h4>
+                            <p>Вредоносные приложения в официальных и неофициальных магазинах, запрашивающие избыточные разрешения</p>
+                        </div>
+                        <div class="card">
+                            <h4>🔗 Социальная инженерия</h4>
+                            <p>Обман пользователей через поддельные уведомления об обновлениях, "бесплатных" предложениях, фиктивных конкурсах</p>
+                        </div>
+                        <div class="card">
+                            <h4>⚡ Уязвимости в ПО</h4>
+                            <p>Эксплойты для известных уязвимостей в операционных системах, браузерах и другом ПО</p>
+                        </div>
+                    </div>
+
+                    <h3>⚠️ Известные примеры:</h3>
+                    <ul>
+                        <li><strong>FinFisher (FinSpy)</strong> — коммерческий шпионский комплекс, продававшийся правительствам</li>
+                        <li><strong>Pegasus</strong> — мобильное шпионское ПО для iOS и Android от израильской компании NSO Group</li>
+                        <li><strong>DarkTequila</strong> — сложный банковский троян-шпион, активный в Латинской Америке</li>
+                        <li><strong>CoolWebSearch</strong> — один из самых известных браузерных шпионов</li>
+                        <li><strong>ZeuS/Zbot</strong> — банковский троян с функциями шпионажа</li>
+                        <li><strong>Flame</strong> — сложный шпионский комплекс для государственного шпионажа</li>
+                    </ul>
+
+                    <h3>🛡️ Меры защиты:</h3>
+                    <ol>
+                        <li>Используйте антишпионские программы и регулярно их обновляйте</li>
+                        <li>Не сохраняйте пароли в браузере, особенно для важных аккаунтов</li>
+                        <li>Регулярно проверяйте список установленных программ и удаляйте незнакомые</li>
+                        <li>Используйте двухфакторную аутентификацию для всех важных сервисов</li>
+                        <li>Будьте осторожны с бесплатным ПО, читайте условия установки</li>
+                        <li>Закрывайте веб-камеру физическими шторками, когда не используете</li>
+                        <li>Обновляйте операционную систему и все установленные программы</li>
+                        <li>Используйте брандмауэр для контроля сетевого трафика</li>
+                        <li>Шифруйте важные данные и документы</li>
+                        <li>Ограничивайте разрешения приложений на мобильных устройствах</li>
+                    </ol>
+
+                    <h3>🔍 Как обнаружить spyware:</h3>
+                    <ul>
+                        <li>Необычно медленная работа компьютера и браузера</li>
+                        <li>Появление незнакомых программ в автозагрузке</li>
+                        <li>Неожиданные всплывающие окна и реклама</li>
+                        <li>Изменение домашней страницы или поисковой системы в браузере</li>
+                        <li>Необычная сетевая активность в фоновом режиме</li>
+                        <li>Самопроизвольное открытие окон или программ</li>
+                        <li>Нехватка свободного места на диске без видимых причин</li>
+                        <li>Индикатор активности жесткого диска мигает, когда вы ничего не делаете</li>
+                    </ul>
+
+                    <h3>🆘 Что делать при заражении:</h3>
+                    <ol>
+                        <li>Немедленно отключите компьютер от интернета</li>
+                        <li>Запустите антишпионское сканирование в безопасном режиме</li>
+                        <li>Проверьте и очистите автозагрузку от подозрительных записей</li>
+                        <li>Удалите подозрительные программы через панель управления</li>
+                        <li>Очистите браузеры от незнакомых расширений</li>
+                        <li>Измените все пароли на другом устройстве</li>
+                        <li>Включите двухфакторную аутентификацию везде, где возможно</li>
+                        <li>Проверьте банковские счета на предмет несанкционированных операций</li>
+                        <li>Усильте защиту системы дополнительными средствами</li>
+                        <li>Рассмотрите восстановление системы из чистой резервной копии</li>
+                    </ol>
+
+                    <div style="background: linear-gradient(135deg, #fff3cd, #ffeaa7); padding: 1.5rem; border-radius: 8px; margin-top: 2rem; border-left: 5px solid #ffc107;">
+                        <h4>💡 Важно знать:</h4>
+                        <p>Шпионское ПО отличается от других вредоносных программ тем, что его основная цель — не разрушение системы, а скрытый сбор информации. Оно может годами оставаться незамеченным, постепенно собирая все больше данных о пользователе. Современные шпионские программы часто используют техники маскировки, обходящие традиционные антивирусные решения.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Тестовый раздел -->
+            <section id="testSection" class="content-section">
+                <div class="test-section">
+                    <h2>📝 Тест по Шпионскому ПО</h2>
+                    <p>Ответьте на вопросы, чтобы проверить свои знания о защите от шпионского ПО.</p>
+                    
+                    <div class="question">
+                        <h3>Вопрос 1: Какая основная цель шпионского ПО (spyware)?</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="q1" value="1" onclick="selectOption(this)">
+                                Шифрование файлов пользователя для требования выкупа
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="2" onclick="selectOption(this)">
+                                Тайный сбор информации о пользователе без его ведома
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="3" onclick="selectOption(this)">
+                                Быстрое распространение по сети для создания ботнетов
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="q1" value="4" onclick="selectOption(this)">
+                                Уничтожение данных на жестком диске
+                            </label>
+                        </div>
+                        <button class="button" onclick="checkTestAnswer(1)">✅ Проверить ответ</button>
+                        <div class="result" id="result1"></div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Вопрос 2: Какие из перечисленных мер помогают защититься от spyware? (Выберите все верные)</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="checkbox" name="q2" value="1" onclick="selectOption(this)">
+                                Сохранять все пароли в браузере для удобства
+                            </label>
+                            <label class="option">
+                                <input type="checkbox" name="q2" value="2" onclick="selectOption(this)">
+                                Использовать антишпионские программы и регулярно их обновлять
+                            </label>
+                            <label class="option">
+                                <input type="checkbox" name="q2" value="3" onclick="selectOption(this)">
+                                Включать двухфакторную аутентификацию для важных аккаунтов
+                            </label>
+                            <label class="option">
+                                <input type="checkbox" name="q2" value="4" onclick="selectOption(this)">
+                                Внимательно читать условия установки бесплатного ПО
+                            </label>
+                            <label class="option">
+                                <input type="checkbox" name="q2" value="5" onclick="selectOption(this)">
+                                Давать приложениям все запрашиваемые разрешения
+                            </label>
+                        </div>
+                        <button class="button" onclick="checkTestAnswer(2)">✅ Проверить ответ</button>
+                        <div class="result" id="result2"></div>
+                    </div>
+                    
+                    <button class="button primary" onclick="checkAllTestAnswers()">📊 Проверить все ответы</button>
+                </div>
+            </section>
+
+            <!-- Игровой раздел - ТОЧНО ТАК КАК У ТРОЯНОВ -->
+            <section id="gameSection" class="content-section">
+                <div class="game-section">
+                    <div class="game-header">
+                        <h2>🎮 Защита приватности от Шпионского ПО</h2>
+                        <p>Управляйте специалистом по кибербезопасности и пройдите все 5 уровней защиты данных!</p>
+                    </div>
+
+                    <!-- ВЕРХНИЙ РЯД: Лево - счетчик уровней и баллы, Право - игра -->
+                    <div class="game-top-row">
+                        <!-- Левая колонка: Счетчик уровней и баллы -->
+                        <div class="game-stats-sidebar">
+                            <div class="level-info">
+                                <h3>Уровень <span id="currentLevel">1</span> из 5</h3>
+                                <p id="levelDescription">Обнаружьте и удалите кейлоггеры и трекеры</p>
+                                
+                                <div class="level-objectives" id="levelObjectives">
+                                    <!-- Задачи уровня будут добавлены здесь -->
+                                </div>
+                            </div>
+
+                            <div class="game-stats">
+                                <div class="stat-row">
+                                    <span class="stat-label">Баллы:</span>
+                                    <span class="stat-value score" id="gameScore">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Приватность:</span>
+                                    <span class="stat-value health" id="gameHealth">100%</span>
+                                </div>
+                                <div class="health-bar">
+                                    <div class="health-fill" id="healthBar" style="width: 100%"></div>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Собрано средств:</span>
+                                    <span class="stat-value" id="collectedItems">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Осталось угроз:</span>
+                                    <span class="stat-value" id="remainingThreats">3</span>
+                                </div>
+                            </div>
+
+                            <button class="start-game-btn" onclick="startGame()">
+                                ▶ Начать игру
+                            </button>
+                        </div>
+
+                        <!-- Правая колонка: Игра -->
+                        <div class="game-map-container">
+                            <div class="game-map" id="gameMap">
+                                <!-- Объекты добавляются динамически -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- НИЖНИЙ РЯД: Управление и инвентарь ПОД игрой -->
+                    <div class="game-bottom-row">
+                        <!-- Левая колонка: Управление -->
+                        <div class="controls">
+                            <h4>Управление:</h4>
+                            <div class="control-buttons">
+                                <button class="control-btn" onclick="moveCharacter('up')">↑ Вверх</button>
+                                <button class="control-btn" onclick="moveCharacter('left')">← Влево</button>
+                                <button class="control-btn" onclick="moveCharacter('right')">→ Вправо</button>
+                                <button class="control-btn" onclick="moveCharacter('down')">↓ Вниз</button>
+                                <button class="control-btn action" onclick="useItem()">🛡️ Использовать</button>
+                                <button class="control-btn action" onclick="scanArea()">🔍 Сканировать</button>
+                            </div>
+                        </div>
+
+                        <!-- Правая колонка: Инвентарь -->
+                        <div class="inventory">
+                            <h4>Инвентарь:</h4>
+                            <div class="inventory-items" id="inventory">
+                                <div style="color: rgba(255,255,255,0.6); font-style: italic; width: 100%; text-align: center;">
+                                    Пусто
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Подвал -->
+        <footer>
+            <p>Образовательный проект по кибербезопасности © 2026</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #495057;">
+                Шпионское ПО — невидимая угроза вашей приватности. Защита данных начинается с осведомленности!
+            </p>
+        </footer>
+    </div>
+
+    <!-- Всплывающие сообщения -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Диалоговые окна -->
+    <div class="dialog-overlay" id="dialogOverlay">
+        <div class="dialog">
+            <div class="dialog-title" id="dialogTitle">Обнаружено шпионское ПО</div>
+            <div class="dialog-text" id="dialogText"></div>
+            <div class="dialog-options" id="dialogOptions"></div>
+        </div>
+    </div>
+
+    <!-- Миниигры -->
+    <div class="dialog-overlay" id="freewareGame">
+        <div class="dialog">
+            <div class="dialog-title">📦 Установка бесплатной программы</div>
+            <div class="dialog-text">Вы устанавливаете бесплатную программу. Установщик предлагает дополнительные компоненты. Как поступите?</div>
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <strong>Программа: Free Media Converter 2024</strong><br>
+                <small>Установщик предлагает:</small><br>
+                <small>• Ускоритель браузера (рекомендуется)</small><br>
+                <small>• Панель поиска (полезное дополнение)</small><br>
+                <small>• Антивирусный сканер (для защиты)</small>
+            </div>
+            <div class="dialog-options">
+                <button class="dialog-option" onclick="checkFreewareChoice('express')">Экспресс-установка (все компоненты)</button>
+                <button class="dialog-option" onclick="checkFreewareChoice('custom')">Выборочная установка (только нужное)</button>
+                <button class="dialog-option" onclick="checkFreewareChoice('cancel')">Отменить установку, поискать альтернативу</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="passwordGame">
+        <div class="dialog">
+            <div class="dialog-title">🔐 Сохранение паролей</div>
+            <div class="dialog-text">Браузер предлагает сохранить пароль от вашего банковского аккаунта. Что вы сделаете?</div>
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <strong>Сайт: mybank-secure.com</strong><br>
+                <small>Браузер Chrome предлагает: "Сохранить пароль для этого сайта?"</small><br>
+                <small>Варианты: Сохранить / Не сейчас / Никогда не сохранять</small>
+            </div>
+            <div class="dialog-options">
+                <button class="dialog-option" onclick="checkPasswordChoice('save')">Сохранить, удобно же</button>
+                <button class="dialog-option" onclick="checkPasswordChoice('manager')">Использовать менеджер паролей вместо браузера</button>
+                <button class="dialog-option" onclick="checkPasswordChoice('never')">Никогда не сохранять пароли в браузере</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+        let currentSection = 'info';
+        let gameActive = false;
+        let gameScore = 0;
+        let gameHealth = 100;
+        let currentLevel = 1;
+        let collectedItems = 0;
+        let inventory = [];
+        let characterPosition = { x: 50, y: 200 };
+        let levelObjects = [];
+        let levelCompleted = false;
+        let testResults = [false, false];
+        let totalLevels = 5;
+
+        // ========== УРОВНИ ИГРЫ ==========
+        const gameLevels = {
+            1: {
+                name: "Основы защиты приватности",
+                description: "Обнаружьте кейлоггеры и настройте базовую защиту",
+                objects: [
+                    { type: 'item', x: 100, y: 100, icon: '🔍', name: 'Антишпионский сканер', id: 'antispyware' },
+                    { type: 'threat', x: 300, y: 150, icon: '⌨️', name: 'Кейлоггер', id: 'keylogger' },
+                    { type: 'item', x: 200, y: 300, icon: '🔥', name: 'Настроенный брандмауэр', id: 'firewall' },
+                    { type: 'exit', x: 400, y: 350, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'antispyware', text: 'Установить антишпионский сканер', completed: false },
+                    { id: 'keylogger', text: 'Обнаружить и удалить кейлоггер', completed: false },
+                    { id: 'firewall', text: 'Настроить брандмауэр', completed: false }
+                ],
+                requiredItems: 2,
+                threats: 1
+            },
+            2: {
+                name: "Браузерная безопасность",
+                description: "Защитите браузер от трекеров и вредоносных расширений",
+                objects: [
+                    { type: 'item', x: 150, y: 80, icon: '🌐', name: 'Расширение блокировки трекеров', id: 'trackerblocker' },
+                    { type: 'threat', x: 350, y: 120, icon: '👁️', name: 'Браузерный трекер', id: 'tracker' },
+                    { type: 'item', x: 100, y: 250, icon: '🔒', name: 'Менеджер паролей', id: 'passwordmanager' },
+                    { type: 'threat', x: 300, y: 280, icon: '🧩', name: 'Вредоносное расширение браузера', id: 'extension' },
+                    { type: 'exit', x: 400, y: 180, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'trackerblocker', text: 'Установить блокировщик трекеров', completed: false },
+                    { id: 'tracker', text: 'Блокировать браузерный трекер', completed: false },
+                    { id: 'passwordmanager', text: 'Настроить менеджер паролей', completed: false }
+                ],
+                requiredItems: 2,
+                threats: 2
+            },
+            3: {
+                name: "Мобильные угрозы",
+                description: "Защитите смартфон от мобильного шпионского ПО",
+                objects: [
+                    { type: 'item', x: 80, y: 120, icon: '📱', name: 'Мобильный антивирус', id: 'mobileantivirus' },
+                    { type: 'threat', x: 250, y: 100, icon: '🕵️', name: 'Мобильный spyware Pegasus', id: 'pegasus' },
+                    { type: 'item', x: 350, y: 200, icon: '📊', name: 'Монитор разрешений приложений', id: 'permissionmonitor' },
+                    { type: 'threat', x: 150, y: 300, icon: '🎯', name: 'Целевое мобильное шпионство', id: 'targeted' },
+                    { type: 'threat', x: 320, y: 320, icon: '📍', name: 'Трекер геолокации', id: 'geotracker' },
+                    { type: 'exit', x: 400, y: 50, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'mobileantivirus', text: 'Установить мобильный антивирус', completed: false },
+                    { id: 'pegasus', text: 'Обнаружить мобильный spyware', completed: false },
+                    { id: 'permissionmonitor', text: 'Настроить монитор разрешений', completed: false },
+                    { id: 'geotracker', text: 'Отключить трекер геолокации', completed: false }
+                ],
+                requiredItems: 3,
+                threats: 3
+            },
+            4: {
+                name: "Корпоративная защита",
+                description: "Защитите корпоративную сеть от сложного шпионского ПО",
+                objects: [
+                    { type: 'item', x: 100, y: 180, icon: '🏢', name: 'Корпоративная защита от шпионажа', id: 'corpsecurity' },
+                    { type: 'threat', x: 280, y: 140, icon: '🕵️‍♂️', name: 'Продвинутый шпион FinFisher', id: 'finfisher' },
+                    { type: 'item', x: 180, y: 280, icon: '🎭', name: 'Система обнаружения аномалий', id: 'anomalydetection' },
+                    { type: 'threat', x: 380, y: 220, icon: '📧', name: 'Шпион для перехвата email', id: 'emailspy' },
+                    { type: 'item', x: 320, y: 320, icon: '💾', name: 'Шифрование корпоративных данных', id: 'encryption' },
+                    { type: 'exit', x: 50, y: 50, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'corpsecurity', text: 'Настроить корпоративную защиту', completed: false },
+                    { id: 'finfisher', text: 'Обнаружить продвинутый spyware', completed: false },
+                    { id: 'anomalydetection', text: 'Включить обнаружение аномалий', completed: false },
+                    { id: 'emailspy', text: 'Блокировать шпиона для email', completed: false }
+                ],
+                requiredItems: 3,
+                threats: 3
+            },
+            5: {
+                name: "Продвинутая приватность",
+                description: "Защититесь от государственного шпионажа и сложных угроз",
+                objects: [
+                    { type: 'item', x: 120, y: 100, icon: '🤖', name: 'AI-система защиты приватности', id: 'aiprivacy' },
+                    { type: 'threat', x: 280, y: 80, icon: '🔥', name: 'Сложный шпионский комплекс Flame', id: 'flame' },
+                    { type: 'item', x: 180, y: 200, icon: '🎯', name: 'Система предотвращения утечек', id: 'dleak' },
+                    { type: 'threat', x: 350, y: 180, icon: '🏠', name: 'IoT шпион для умного дома', id: 'iotspy' },
+                    { type: 'item', x: 250, y: 300, icon: '🎓', name: 'Обучение сотрудников приватности', id: 'training' },
+                    { type: 'threat', x: 100, y: 350, icon: '🔄', name: 'Кросс-платформенный шпион', id: 'crossplatform' },
+                    { type: 'exit', x: 400, y: 350, icon: '🚪', name: 'Выход', id: 'exit' }
+                ],
+                objectives: [
+                    { id: 'aiprivacy', text: 'Включить AI-защиту приватности', completed: false },
+                    { id: 'flame', text: 'Обнаружить сложный шпионский комплекс', completed: false },
+                    { id: 'dleak', text: 'Настроить предотвращение утечек', completed: false },
+                    { id: 'iotspy', text: 'Заблокировать IoT шпиона', completed: false },
+                    { id: 'crossplatform', text: 'Обезвредить кросс-платформенного шпиона', completed: false }
+                ],
+                requiredItems: 4,
+                threats: 3
+            }
+        };
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('info');
+            setupKeyboardControls();
+            initGame();
+        });
+
+        // ========== ПЕРЕКЛЮЧЕНИЕ РАЗДЕЛОВ ==========
+        function showSection(section) {
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(section + 'Section').classList.add('active');
+            document.querySelector(`.nav-button[onclick="showSection('${section}')"]`).classList.add('active');
+            
+            currentSection = section;
+            
+            if (section === 'game' && !gameActive) {
+                initGame();
+            }
+        }
+
+        // ========== ТЕСТОВЫЙ РЕЖИМ ==========
+        function selectOption(element) {
+            const options = element.closest('.options').querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            if (element.checked) {
+                element.closest('.option').classList.add('selected');
+            }
+        }
+
+        function checkTestAnswer(questionNum) {
+            const resultElement = document.getElementById(`result${questionNum}`);
+            
+            if (questionNum === 1) {
+                const selected = document.querySelector('input[name="q1"]:checked');
+                if (!selected) {
+                    showTestResult(resultElement, "❌ Пожалуйста, выберите ответ", false);
+                    return;
+                }
+                
+                if (selected.value === "2") {
+                    showTestResult(resultElement, "✅ Правильно! Основная цель шпионского ПО — тайный сбор информации о пользователе без его ведома.", true);
+                    testResults[0] = true;
+                } else {
+                    showTestResult(resultElement, "❌ Неверно. Правильный ответ: тайный сбор информации о пользователе без его ведома.", false);
+                }
+            } 
+            else if (questionNum === 2) {
+                const checkboxes = document.querySelectorAll('input[name="q2"]:checked');
+                const values = Array.from(checkboxes).map(cb => cb.value);
+                
+                if (values.length === 0) {
+                    showTestResult(resultElement, "❌ Пожалуйста, выберите варианты", false);
+                    return;
+                }
+                
+                const correctValues = ["2", "3", "4"];
+                const isCorrect = values.length === 3 && 
+                                 values.includes("2") && 
+                                 values.includes("3") && 
+                                 values.includes("4");
+                
+                if (isCorrect) {
+                    showTestResult(resultElement, "✅ Отлично! Вы выбрали все правильные меры защиты от шпионского ПО.", true);
+                    testResults[1] = true;
+                } else {
+                    showTestResult(resultElement, "❌ Не все ответы верны. Правильные меры: использовать антишпионские программы, включать двухфакторную аутентификацию, внимательно читать условия установки.", false);
+                }
+            }
+        }
+
+        function showTestResult(element, message, isCorrect) {
+            element.textContent = message;
+            element.className = isCorrect ? "result correct" : "result incorrect";
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function checkAllTestAnswers() {
+            checkTestAnswer(1);
+            checkTestAnswer(2);
+            
+            setTimeout(() => {
+                const allCorrect = testResults.every(answer => answer === true);
+                if (allCorrect) {
+                    showToast("🎉 Поздравляем! Вы успешно прошли тест по шпионскому ПО!", 'success');
+                } else {
+                    showToast("📚 Некоторые ответы неверны. Изучите материал еще раз!", 'warning');
+                }
+            }, 1000);
+        }
+
+        // ========== ИГРОВОЙ РЕЖИМ ==========
+        function initGame() {
+            gameActive = false;
+            gameScore = 0;
+            gameHealth = 100;
+            currentLevel = 1;
+            collectedItems = 0;
+            inventory = [];
+            characterPosition = { x: 50, y: 200 };
+            
+            loadLevel(currentLevel);
+            updateGameUI();
+        }
+
+        function startGame() {
+            if (!gameActive) {
+                gameActive = true;
+                updateGameUI();
+                showToast("🎮 Игра началась! Защитите свою приватность от шпионского ПО.", 'success');
+            }
+        }
+
+        function loadLevel(levelNum) {
+            if (levelNum > totalLevels) {
+                completeGame();
+                return;
+            }
+            
+            currentLevel = levelNum;
+            levelCompleted = false;
+            const level = gameLevels[levelNum];
+            
+            document.getElementById('currentLevel').textContent = levelNum;
+            document.getElementById('levelDescription').textContent = level.description;
+            
+            const objectivesList = document.getElementById('levelObjectives');
+            objectivesList.innerHTML = '';
+            level.objectives.forEach(obj => {
+                const li = document.createElement('li');
+                li.className = 'level-objective';
+                li.id = `objective-${obj.id}`;
+                li.textContent = obj.text;
+                objectivesList.appendChild(li);
+            });
+            
+            const gameMap = document.getElementById('gameMap');
+            gameMap.innerHTML = '';
+            
+            const character = document.createElement('div');
+            character.className = 'map-object character';
+            character.id = 'character';
+            character.style.left = characterPosition.x + 'px';
+            character.style.top = characterPosition.y + 'px';
+            character.textContent = '👨‍💻';
+            character.title = 'Специалист по приватности';
+            gameMap.appendChild(character);
+            
+            levelObjects = [];
+            level.objects.forEach(obj => {
+                const element = document.createElement('div');
+                element.className = `map-object ${obj.type}`;
+                element.id = `obj-${obj.id}`;
+                element.style.left = obj.x + 'px';
+                element.style.top = obj.y + 'px';
+                element.textContent = obj.icon;
+                element.title = obj.name;
+                element.dataset.type = obj.type;
+                element.dataset.id = obj.id;
+                element.dataset.name = obj.name;
+                gameMap.appendChild(element);
+                
+                levelObjects.push({
+                    element: element,
+                    ...obj,
+                    collected: false
+                });
+            });
+            
+            updateRemainingThreats();
+        }
+
+        function moveCharacter(direction) {
+            if (!gameActive || levelCompleted) return;
+            
+            const step = 30;
+            const character = document.getElementById('character');
+            
+            switch(direction) {
+                case 'up':
+                    if (characterPosition.y - step >= 20) characterPosition.y -= step;
+                    break;
+                case 'down':
+                    if (characterPosition.y + step <= 370) characterPosition.y += step;
+                    break;
+                case 'left':
+                    if (characterPosition.x - step >= 20) characterPosition.x -= step;
+                    break;
+                case 'right':
+                    if (characterPosition.x + step <= 450) characterPosition.x += step;
+                    break;
+            }
+            
+            character.style.left = characterPosition.x + 'px';
+            character.style.top = characterPosition.y + 'px';
+            
+            checkCollisions();
+            gameScore += 5;
+            updateGameUI();
+        }
+
+        function checkCollisions() {
+            levelObjects.forEach(obj => {
+                if (obj.collected) return;
+                
+                const objRect = {
+                    x: parseInt(obj.element.style.left),
+                    y: parseInt(obj.element.style.top),
+                    width: 60,
+                    height: 60
+                };
+                
+                const charRect = {
+                    x: characterPosition.x,
+                    y: characterPosition.y,
+                    width: 60,
+                    height: 60
+                };
+                
+                if (isColliding(charRect, objRect)) {
+                    interactWithObject(obj);
+                }
+            });
+        }
+
+        function isColliding(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        function interactWithObject(obj) {
+            if (!gameActive || obj.collected || levelCompleted) return;
+            
+            switch(obj.type) {
+                case 'item':
+                    collectItem(obj);
+                    break;
+                case 'threat':
+                    handleThreat(obj);
+                    break;
+                case 'exit':
+                    tryExitLevel();
+                    break;
+            }
+        }
+
+        function collectItem(obj) {
+            obj.collected = true;
+            obj.element.classList.add('collected');
+            collectedItems++;
+            inventory.push(obj.name);
+            gameScore += 100;
+            
+            const objective = document.getElementById(`objective-${obj.id}`);
+            if (objective) {
+                objective.classList.add('completed');
+            }
+            
+            updateInventory();
+            updateGameUI();
+            showToast(`✅ Собрано: ${obj.name}! +100 баллов`, 'success');
+            
+            const level = gameLevels[currentLevel];
+            const collectedRequiredItems = levelObjects.filter(o => o.type === 'item' && o.collected).length;
+            if (collectedRequiredItems >= level.requiredItems) {
+                showToast("🎯 Достаточно средств защиты собрано! Можно идти к выходу.", 'info');
+            }
+        }
+
+        function handleThreat(obj) {
+            if (obj.id === 'keylogger' || obj.id === 'tracker' || obj.id === 'extension') {
+                showPasswordGame(obj);
+            } else if (obj.id === 'pegasus' || obj.id === 'finfisher' || obj.id === 'flame') {
+                showFreewareGame(obj);
+            } else {
+                showThreatDialog(obj);
+            }
+        }
+
+        function showThreatDialog(obj) {
+            showDialog(
+                `Обнаружено шпионское ПО: ${obj.name}`,
+                getThreatDescription(obj.id),
+                [
+                    { 
+                        text: 'Удалить и заблокировать шпиона', 
+                        action: () => neutralizeThreat(obj) 
+                    },
+                    { 
+                        text: 'Проигнорировать и продолжить работу', 
+                        action: () => takeDamage(30) 
+                    }
+                ]
+            );
+        }
+
+        function getThreatDescription(threatId) {
+            const descriptions = {
+                'keylogger': 'Кейлоггер записывает все нажатия клавиш. Может украсть пароли, сообщения, другую конфиденциальную информацию.',
+                'tracker': 'Браузерный трекер отслеживает вашу активность в интернете. Собирает историю посещений, поисковые запросы.',
+                'extension': 'Вредоносное расширение браузера имеет доступ ко всем вашим данным в браузере. Может красть пароли, историю, cookie.',
+                'pegasus': 'Продвинутое мобильное шпионское ПО Pegasus. Может активировать камеру и микрофон, собирать данные из приложений.',
+                'finfisher': 'Коммерческий шпионский комплекс FinFisher. Используется для целевого наблюдения. Очень сложен для обнаружения.',
+                'targeted': 'Целевое шпионское ПО для конкретного пользователя или организации. Собирает конфиденциальные деловые данные.',
+                'geotracker': 'Трекер геолокации отслеживает ваше местоположение в реальном времени. Нарушает приватность перемещений.',
+                'emailspy': 'Шпион для перехвата электронной почты. Читает входящие и исходящие сообщения, может красть вложения.',
+                'flame': 'Сложный шпионский комплекс Flame. Собирает документы, аудио, скриншоты, перехватывает сетевой трафик.',
+                'iotspy': 'IoT шпион для умных устройств. Может активировать камеры умного дома, микрофоны, собирать данные с датчиков.',
+                'crossplatform': 'Кросс-платформенный шпион работает на компьютерах и мобильных устройствах одновременно. Синхронизирует собранные данные.'
+            };
+            
+            return descriptions[threatId] || 'Неизвестное шпионское ПО. Может собирать конфиденциальную информацию о вас.';
+        }
+
+        function neutralizeThreat(obj) {
+            obj.collected = true;
+            obj.element.classList.add('collected');
+            gameScore += 150;
+            
+            const objective = document.getElementById(`objective-${obj.id}`);
+            if (objective) {
+                objective.classList.add('completed');
+            }
+            
+            updateRemainingThreats();
+            updateGameUI();
+            showToast(`✅ Шпионское ПО "${obj.name}" нейтрализовано! +150 баллов`, 'success');
+        }
+
+        function tryExitLevel() {
+            const level = gameLevels[currentLevel];
+            const collectedRequiredItems = levelObjects.filter(o => o.type === 'item' && o.collected).length;
+            const remainingThreats = levelObjects.filter(o => o.type === 'threat' && !o.collected).length;
+            
+            if (collectedRequiredItems >= level.requiredItems && remainingThreats === 0) {
+                completeLevel();
+            } else {
+                let message = "❌ Нельзя покинуть уровень!\n";
+                if (collectedRequiredItems < level.requiredItems) {
+                    message += `Нужно собрать еще ${level.requiredItems - collectedRequiredItems} средств защиты\n`;
+                }
+                if (remainingThreats > 0) {
+                    message += `Осталось нейтрализовать ${remainingThreats} шпионских программ`;
+                }
+                showToast(message, 'error');
+            }
+        }
+
+        function completeLevel() {
+            levelCompleted = true;
+            const bonus = 500 + (gameHealth * 5);
+            gameScore += bonus;
+            
+            showDialog(
+                "🎉 Уровень пройден!",
+                `Вы успешно защитили приватность на уровне ${currentLevel}!\n\n` +
+                `Бонусные баллы: +${bonus}\n` +
+                `Общий счет: ${gameScore}\n\n` +
+                `Готовы к следующему уровню?`,
+                [
+                    { 
+                        text: 'Следующий уровень', 
+                        action: () => {
+                            currentLevel++;
+                            loadLevel(currentLevel);
+                            hideDialog();
+                            showToast(`🎮 Начался уровень ${currentLevel}!`, 'success');
+                        } 
+                    },
+                    { 
+                        text: 'Завершить игру', 
+                        action: () => {
+                            hideDialog();
+                            showToast(`🎮 Игра завершена! Ваш счет: ${gameScore}`, 'success');
+                        } 
+                    }
+                ]
+            );
+            
+            updateGameUI();
+        }
+
+        function completeGame() {
+            gameActive = false;
+            showDialog(
+                "🏆 Игра пройдена!",
+                `Поздравляем! Вы прошли все 5 уровней защиты от шпионского ПО!\n\n` +
+                `Итоговый счет: ${gameScore}\n` +
+                `Собрано средств защиты: ${collectedItems}\n` +
+                `Ваша приватность надежно защищена от шпионских угроз!`,
+                [
+                    { 
+                        text: 'Начать заново', 
+                        action: () => {
+                            hideDialog();
+                            initGame();
+                            startGame();
+                        } 
+                    },
+                    { 
+                        text: 'Выйти в меню', 
+                        action: () => {
+                            hideDialog();
+                            showSection('info');
+                        } 
+                    }
+                ]
+            );
+        }
+
+        function useItem() {
+            if (!gameActive || inventory.length === 0) {
+                showToast("❌ В инвентаре нет средств защиты для использования", 'error');
+                return;
+            }
+            
+            const item = inventory.pop();
+            gameHealth = Math.min(100, gameHealth + 25);
+            gameScore += 50;
+            updateInventory();
+            updateGameUI();
+            showToast(`🛡️ Использовано: ${item}. Приватность восстановлена на 25%`, 'success');
+        }
+
+        function scanArea() {
+            if (!gameActive) return;
+            
+            gameScore += 20;
+            const nearbyItems = levelObjects.filter(obj => 
+                !obj.collected && 
+                obj.type === 'item' && 
+                Math.abs(characterPosition.x - obj.x) < 100 &&
+                Math.abs(characterPosition.y - obj.y) < 100
+            ).length;
+            
+            const nearbyThreats = levelObjects.filter(obj => 
+                !obj.collected && 
+                obj.type === 'threat' && 
+                Math.abs(characterPosition.x - obj.x) < 100 &&
+                Math.abs(characterPosition.y - obj.y) < 100
+            ).length;
+            
+            showToast(`🔍 Сканирование... Найдено: ${nearbyItems} средств защиты, ${nearbyThreats} шпионских программ поблизости`, 'info');
+            updateGameUI();
+        }
+
+        function takeDamage(amount) {
+            gameHealth = Math.max(0, gameHealth - amount);
+            
+            if (gameHealth <= 0) {
+                gameOver();
+            } else {
+                showToast(`💥 Шпионское ПО собрало ваши данные! Приватность уменьшена на ${amount}%`, 'error');
+                updateGameUI();
+            }
+        }
+
+        function gameOver() {
+            gameActive = false;
+            showDialog(
+                "💀 Приватность нарушена!",
+                "Шпионское ПО собрало ваши конфиденциальные данные. Ваши пароли, сообщения и личная информация скомпрометированы.",
+                [
+                    { 
+                        text: 'Начать заново', 
+                        action: () => {
+                            hideDialog();
+                            initGame();
+                            startGame();
+                        } 
+                    },
+                    { 
+                        text: 'Выйти в меню', 
+                        action: () => {
+                            hideDialog();
+                            showSection('info');
+                        } 
+                    }
+                ]
+            );
+        }
+
+        // ========== МИНИ-ИГРЫ ==========
+        function showFreewareGame(obj) {
+            document.getElementById('freewareGame').dataset.threatId = obj.id;
+            document.getElementById('freewareGame').style.display = 'flex';
+        }
+
+        function checkFreewareChoice(choice) {
+            const threatId = document.getElementById('freewareGame').dataset.threatId;
+            document.getElementById('freewareGame').style.display = 'none';
+            
+            if (choice === 'custom' || choice === 'cancel') {
+                gameScore += 200;
+                showToast("✅ Правильный выбор! Вы избежали установки шпионского ПО с бесплатной программой. +200 баллов", 'success');
+                
+                const threatObj = levelObjects.find(obj => obj.id === threatId);
+                if (threatObj) {
+                    threatObj.collected = true;
+                    threatObj.element.classList.add('collected');
+                    
+                    const objective = document.getElementById(`objective-${threatId}`);
+                    if (objective) {
+                        objective.classList.add('completed');
+                    }
+                    
+                    updateRemainingThreats();
+                }
+            } else {
+                takeDamage(40);
+                showToast("❌ Опасность! Вы установили шпионское ПО вместе с бесплатной программой. Ваши данные собраны.", 'error');
+            }
+            
+            updateGameUI();
+        }
+
+        function showPasswordGame(obj) {
+            document.getElementById('passwordGame').dataset.threatId = obj.id;
+            document.getElementById('passwordGame').style.display = 'flex';
+        }
+
+        function checkPasswordChoice(choice) {
+            const threatId = document.getElementById('passwordGame').dataset.threatId;
+            document.getElementById('passwordGame').style.display = 'none';
+            
+            if (choice === 'manager' || choice === 'never') {
+                gameScore += 180;
+                showToast("✅ Правильно! Вы защитили свои пароли от возможного кража шпионским ПО. +180 баллов", 'success');
+                
+                const threatObj = levelObjects.find(obj => obj.id === threatId);
+                if (threatObj) {
+                    threatObj.collected = true;
+                    threatObj.element.classList.add('collected');
+                    
+                    const objective = document.getElementById(`objective-${threatId}`);
+                    if (objective) {
+                        objective.classList.add('completed');
+                    }
+                    
+                    updateRemainingThreats();
+                }
+            } else {
+                takeDamage(35);
+                showToast("❌ Опасность! Ваш пароль сохранен в браузере и может быть украден шпионским ПО.", 'error');
+            }
+            
+            updateGameUI();
+        }
+
+        // ========== ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ==========
+        function updateGameUI() {
+            document.getElementById('gameScore').textContent = gameScore;
+            document.getElementById('gameHealth').textContent = gameHealth + '%';
+            document.getElementById('healthBar').style.width = gameHealth + '%';
+            document.getElementById('collectedItems').textContent = collectedItems;
+            
+            const healthBar = document.getElementById('healthBar');
+            if (gameHealth > 70) {
+                healthBar.style.background = 'linear-gradient(90deg, #4CAF50, #2E7D32)';
+            } else if (gameHealth > 30) {
+                healthBar.style.background = 'linear-gradient(90deg, #ff9800, #ff5722)';
+            } else {
+                healthBar.style.background = 'linear-gradient(90deg, #f44336, #d32f2f)';
+            }
+        }
+
+        function updateRemainingThreats() {
+            const remaining = levelObjects.filter(obj => obj.type === 'threat' && !obj.collected).length;
+            document.getElementById('remainingThreats').textContent = remaining;
+        }
+
+        function updateInventory() {
+            const inventoryEl = document.getElementById('inventory');
+            inventoryEl.innerHTML = '';
+            
+            if (inventory.length === 0) {
+                inventoryEl.innerHTML = '<div style="color: rgba(255,255,255,0.6); font-style: italic; width: 100%; text-align: center;">Пусто</div>';
+            } else {
+                inventory.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'inventory-item';
+                    itemEl.textContent = item;
+                    inventoryEl.appendChild(itemEl);
+                });
+            }
+        }
+
+        // ========== ВСПЛЫВАЮЩИЕ СООБЩЕНИЯ ==========
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // ========== ДИАЛОГОВЫЕ ФУНКЦИИ ==========
+        function showDialog(title, text, options) {
+            document.getElementById('dialogTitle').textContent = title;
+            document.getElementById('dialogText').textContent = text;
+            
+            const optionsContainer = document.getElementById('dialogOptions');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'dialog-option';
+                button.textContent = option.text;
+                button.onclick = () => {
+                    option.action();
+                    hideDialog();
+                };
+                optionsContainer.appendChild(button);
+            });
+            
+            document.getElementById('dialogOverlay').style.display = 'flex';
+        }
+
+        function hideDialog() {
+            document.getElementById('dialogOverlay').style.display = 'none';
+            document.getElementById('freewareGame').style.display = 'none';
+            document.getElementById('passwordGame').style.display = 'none';
+        }
+
+        // ========== УПРАВЛЕНИЕ С КЛАВИАТУРЫ ==========
+        function setupKeyboardControls() {
+            document.addEventListener('keydown', function(e) {
+                if (!gameActive || currentSection !== 'game') return;
+                
+                switch(e.key.toLowerCase()) {
+                    case 'arrowup':
+                    case 'w':
+                        e.preventDefault();
+                        moveCharacter('up');
+                        break;
+                    case 'arrowleft':
+                    case 'a':
+                        e.preventDefault();
+                        moveCharacter('left');
+                        break;
+                    case 'arrowright':
+                    case 'd':
+                        e.preventDefault();
+                        moveCharacter('right');
+                        break;
+                    case 'arrowdown':
+                    case 's':
+                        e.preventDefault();
+                        moveCharacter('down');
+                        break;
+                    case ' ':
+                        e.preventDefault();
+                        useItem();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        scanArea();
+                        break;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

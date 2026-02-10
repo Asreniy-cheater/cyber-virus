@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Компьютерные вирусы</title>
+<style>
+/* Ваши существующие стили остаются без изменений */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+line-height: 1.6;
+color: #333;
+background-color: #f0f9ff;
+background-image: 
+radial-gradient(circle at 10% 20%, rgba(0, 150, 255, 0.08) 0%, transparent 20%),
+radial-gradient(circle at 90% 30%, rgba(32, 201, 151, 0.08) 0%, transparent 20%),
+radial-gradient(circle at 15% 80%, rgba(0, 180, 216, 0.08) 0%, transparent 20%),
+radial-gradient(circle at 85% 70%, rgba(72, 187, 120, 0.08) 0%, transparent 20%);
+min-height: 100vh;
+position: relative;
+}
+
+body::before {
+content: "";
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230066cc' fill-opacity='0.03' fill-rule='evenodd'%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3Ccircle cx='80' cy='160' r='6'/%3E%3Ccircle cx='160' cy='80' r='10'/%3E%3Ccircle cx='120' cy='120' r='4'/%3E%3Ccircle cx='60' cy='20' r='7'/%3E%3Ccircle cx='20' cy='100' r='5'/%3E%3Ccircle cx='180' cy='180' r='9'/%3E%3Ccircle cx='140' cy='60' r='3'/%3E%3C/g%3E%3C/svg%3E");
+z-index: 0;
+pointer-events: none;
+}
+
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+position: relative;
+z-index: 1;
+}
+
+:root {
+--primary: #0066cc;
+--primary-dark: #0052a3;
+--primary-light: #0077e6;
+--secondary: #20c997;
+--danger: #dc3545;
+--warning: #ffc107;
+--dark: #1e40af;
+--light: #f0f9ff;
+}
+
+header {
+background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+color: white;
+padding: 3rem 0;
+text-align: center;
+border-radius: 15px;
+margin-bottom: 2rem;
+box-shadow: 0 10px 30px rgba(0, 102, 204, 0.2);
+position: relative;
+overflow: hidden;
+}
+
+header::before {
+content: "";
+position: absolute;
+top: -50%;
+left: -50%;
+width: 200%;
+height: 200%;
+background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+animation: float 30s infinite linear;
+}
+
+@keyframes float {
+0% { transform: translate(0, 0) rotate(0deg); }
+100% { transform: translate(-50px, 50px) rotate(360deg); }
+}
+
+h1 {
+font-size: 3rem;
+margin-bottom: 1rem;
+position: relative;
+z-index: 1;
+text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+font-size: 1.3rem;
+opacity: 0.9;
+position: relative;
+z-index: 1;
+margin-bottom: 2rem;
+}
+
+.nav-menu {
+background-color: white;
+border-radius: 12px;
+padding: 1.2rem;
+margin-bottom: 2rem;
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+box-shadow: 0 8px 20px rgba(0, 102, 204, 0.1);
+position: relative;
+z-index: 1;
+}
+
+.nav-item {
+color: var(--dark);
+text-decoration: none;
+padding: 0.8rem 2rem;
+margin: 0.5rem;
+border-radius: 8px;
+transition: all 0.3s ease;
+font-weight: 600;
+border: 2px solid transparent;
+cursor: pointer;
+}
+
+.nav-item:hover {
+background-color: var(--primary);
+color: white;
+transform: translateY(-3px);
+box-shadow: 0 6px 12px rgba(0, 102, 204, 0.3);
+}
+
+.nav-item.active {
+background-color: var(--primary);
+color: white;
+box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3);
+}
+
+.content-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 2rem;
+margin-bottom: 2rem;
+}
+
+.card {
+background: rgba(255, 255, 255, 0.95);
+padding: 2.5rem;
+border-radius: 15px;
+box-shadow: 0 10px 25px rgba(0, 102, 204, 0.08);
+transition: all 0.3s ease;
+backdrop-filter: blur(10px);
+border: 1px solid rgba(0, 102, 204, 0.1);
+}
+
+.card:hover {
+transform: translateY(-10px);
+box-shadow: 0 15px 35px rgba(0, 102, 204, 0.15);
+}
+
+.card h2 {
+color: var(--primary-dark);
+margin-bottom: 1.5rem;
+padding-bottom: 1rem;
+border-bottom: 3px solid var(--primary);
+font-size: 1.8rem;
+}
+
+.card ul {
+padding-left: 1.5rem;
+margin-bottom: 1.5rem;
+}
+
+.card li {
+margin-bottom: 0.8rem;
+position: relative;
+}
+
+.card li::before {
+content: "•";
+color: var(--primary);
+font-weight: bold;
+display: inline-block;
+width: 1em;
+margin-left: -1em;
+}
+
+.classification-container, .protection-container {
+grid-column: 1 / -1;
+}
+
+.classification-grid, .protection-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 2rem;
+margin-top: 2rem;
+}
+
+/* Карточка классификации с улучшенным меню */
+.classification-card {
+background: white;
+padding: 2rem;
+border-radius: 12px;
+box-shadow: 0 8px 20px rgba(0, 102, 204, 0.1);
+transition: all 0.3s ease;
+border: 1px solid #e6f2ff;
+cursor: pointer;
+position: relative;
+margin-bottom: 1rem;
+}
+
+.classification-card::before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 5px;
+background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+}
+
+.classification-card:hover {
+transform: translateY(-8px);
+box-shadow: 0 15px 30px rgba(0, 102, 204, 0.15);
+}
+
+.classification-card h3 {
+color: var(--primary-dark);
+margin-bottom: 1rem;
+font-size: 1.4rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.classification-card h3::after {
+content: "▼";
+color: var(--primary);
+font-weight: bold;
+transition: transform 0.3s ease;
+font-size: 0.9rem;
+}
+
+.classification-card.active h3::after {
+content: "▲";
+transform: rotate(180deg);
+}
+
+/* Выпадающее меню классификации */
+.classification-dropdown {
+max-height: 0;
+overflow: hidden;
+transition: max-height 0.5s ease;
+background: white;
+border-radius: 0 0 12px 12px;
+border: 1px solid #e6f2ff;
+border-top: none;
+margin-top: -5px;
+position: relative;
+z-index: 10;
+}
+
+.classification-card.active {
+z-index: 11;
+border-bottom-left-radius: 0;
+border-bottom-right-radius: 0;
+margin-bottom: 0;
+box-shadow: 0 15px 30px rgba(0, 102, 204, 0.15);
+}
+
+.classification-card.active .classification-dropdown {
+max-height: 500px;
+padding: 1.5rem;
+box-shadow: 0 15px 30px rgba(0, 102, 204, 0.15);
+}
+
+.dropdown-content {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 1rem;
+}
+
+.dropdown-item {
+padding: 1rem;
+border-radius: 8px;
+background: #f8fbff;
+border-left: 4px solid var(--primary);
+transition: all 0.3s ease;
+position: relative;
+cursor: pointer;
+}
+
+.dropdown-item:hover {
+background: #e6f2ff;
+transform: translateX(5px);
+}
+
+.dropdown-item h4 {
+color: var(--primary-dark);
+margin-bottom: 0.5rem;
+font-size: 1.1rem;
+}
+
+.dropdown-item p {
+color: #666;
+font-size: 0.9rem;
+margin-bottom: 0.8rem;
+line-height: 1.4;
+}
+
+/* Одна кнопка "Подробнее" внизу dropdown */
+.classification-details-link {
+display: block;
+background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+color: white;
+text-decoration: none;
+padding: 0.8rem 1.5rem;
+border-radius: 6px;
+font-size: 0.9rem;
+font-weight: 600;
+transition: all 0.3s ease;
+border: none;
+cursor: pointer;
+text-align: center;
+margin-top: 1rem;
+width: 100%;
+}
+
+.classification-details-link:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+background: linear-gradient(135deg, var(--primary-light), var(--primary));
+}
+
+/* Блок защиты */
+.protection-card {
+background: white;
+padding: 2rem;
+border-radius: 12px;
+box-shadow: 0 8px 20px rgba(0, 102, 204, 0.1);
+transition: all 0.3s ease;
+position: relative;
+overflow: hidden;
+border: 1px solid #e6f2ff;
+height: 100%;
+}
+
+.protection-card::before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 5px;
+background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+}
+
+.protection-card:hover {
+transform: translateY(-8px);
+box-shadow: 0 15px 30px rgba(0, 102, 204, 0.15);
+}
+
+.protection-card h4 {
+color: var(--primary-dark);
+margin-bottom: 10px;
+font-size: 1.2rem;
+}
+
+.protection-card p {
+font-size: 0.95rem;
+color: #555;
+line-height: 1.5;
+}
+
+.virus-types-container {
+grid-column: 1 / -1;
+}
+
+/* Новое: Секции вирусов по классификациям */
+.virus-classification-section {
+margin-bottom: 3rem;
+padding-bottom: 2rem;
+border-bottom: 2px solid #e6f2ff;
+position: relative;
+}
+
+.virus-classification-section:last-child {
+border-bottom: none;
+}
+
+.virus-classification-section h3 {
+color: var(--primary-dark);
+margin-bottom: 1.5rem;
+font-size: 1.6rem;
+padding-bottom: 0.5rem;
+border-bottom: 2px solid;
+border-bottom-color: var(--primary);
+display: flex;
+align-items: center;
+}
+
+.virus-classification-section h3::before {
+content: "🏷️";
+margin-right: 10px;
+font-size: 1.4rem;
+}
+
+.virus-types-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 2rem;
+margin-top: 1.5rem;
+}
+
+/* Карточка вируса - ВСЕ СИНИЕ */
+.virus-card {
+background: white;
+padding: 2rem;
+border-radius: 12px;
+box-shadow: 0 8px 20px rgba(0, 102, 204, 0.1);
+transition: all 0.3s ease;
+position: relative;
+overflow: hidden;
+border: 1px solid #e6f2ff;
+margin-bottom: 1.5rem;
+}
+
+/* ВСЕ карточки вирусов теперь СИНИЕ */
+.virus-card::before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 5px;
+background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+}
+
+.virus-card:hover {
+transform: translateY(-8px);
+box-shadow: 0 15px 30px rgba(0, 102, 204, 0.15);
+}
+
+.virus-card h4 {
+color: var(--primary-dark);
+margin-bottom: 1rem;
+font-size: 1.3rem;
+}
+
+.virus-class {
+display: inline-block;
+background-color: rgba(0, 102, 204, 0.1);
+color: var(--primary);
+padding: 0.4rem 1.2rem;
+border-radius: 20px;
+font-size: 0.85rem;
+margin-bottom: 1.2rem;
+font-weight: 600;
+}
+
+.virus-type-badge {
+display: inline-block;
+background: linear-gradient(135deg, var(--primary-light), var(--primary));
+color: white;
+padding: 0.4rem 1rem;
+border-radius: 15px;
+font-size: 0.8rem;
+font-weight: 600;
+margin-left: 10px;
+margin-bottom: 1rem;
+}
+
+.virus-link {
+display: inline-block;
+background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+color: white;
+text-decoration: none;
+padding: 0.8rem 1.8rem;
+border-radius: 8px;
+font-size: 1rem;
+font-weight: 600;
+transition: all 0.3s ease;
+border: none;
+cursor: pointer;
+margin-top: 1rem;
+box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+}
+
+.virus-link:hover {
+transform: translateY(-3px);
+box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4);
+background: linear-gradient(135deg, var(--primary-light), var(--primary));
+}
+
+.interactive-container {
+grid-column: 1 / -1;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 2rem;
+margin-top: 2rem;
+}
+
+footer {
+background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+color: white;
+padding: 3rem 0;
+margin-top: 3rem;
+border-radius: 15px;
+position: relative;
+overflow: hidden;
+}
+
+footer::before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+}
+
+.footer-content {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 2rem;
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 20px;
+position: relative;
+z-index: 1;
+}
+
+.back-to-top {
+position: fixed;
+bottom: 30px;
+right: 30px;
+background: var(--primary);
+color: white;
+width: 50px;
+height: 50px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+text-decoration: none;
+font-size: 1.5rem;
+box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+transition: all 0.3s ease;
+z-index: 1000;
+cursor: pointer;
+border: none;
+}
+
+.back-to-top:hover {
+transform: translateY(-5px);
+background: var(--primary-dark);
+box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+}
+
+/* НОВОЕ: Улучшенная подсветка карточки вируса */
+.virus-card.highlighted {
+animation: highlightCard 3s ease;
+border: 3px solid var(--primary);
+box-shadow: 0 0 40px rgba(0, 102, 204, 0.4);
+position: relative;
+z-index: 100;
+}
+
+@keyframes highlightCard {
+0% { 
+    transform: scale(1.05); 
+    box-shadow: 0 0 50px rgba(0, 102, 204, 0.5);
+}
+100% { 
+    transform: scale(1); 
+    box-shadow: 0 0 30px rgba(0, 102, 204, 0.3);
+}
+}
+
+@media (max-width: 992px) {
+.footer-content {
+grid-template-columns: repeat(2, 1fr);
+}
+.classification-grid, .virus-types-grid, .protection-grid {
+grid-template-columns: 1fr;
+}
+.dropdown-content {
+grid-template-columns: 1fr;
+}
+}
+
+@media (max-width: 768px) {
+.content-grid {
+grid-template-columns: 1fr;
+}
+.interactive-container {
+grid-template-columns: 1fr;
+}
+.footer-content {
+grid-template-columns: 1fr;
+}
+.nav-menu {
+flex-direction: column;
+}
+.nav-item {
+width: 100%;
+text-align: center;
+margin: 0.3rem 0;
+}
+h1 {
+font-size: 2.2rem;
+}
+.back-to-top {
+bottom: 20px;
+right: 20px;
+width: 40px;
+height: 40px;
+font-size: 1.2rem;
+}
+.classification-grid, .protection-grid {
+grid-template-columns: 1fr;
+}
+.classification-card {
+margin-bottom: 1.5rem;
+}
+}
+</style>
+</head>
+<body>
+<button class="back-to-top" onclick="scrollToTop()">↑</button>
+
+<div class="container">
+<header>
+<h1>🛡️ Компьютерные вирусы</h1>
+<p class="subtitle">Полное руководство по классификациям, типам и защите от киберугроз</p>
+</header>
+
+<nav class="nav-menu">
+<a href="#classification" class="nav-item active">Классификации вирусов</a>
+<a href="#virus-types" class="nav-item">Типы вирусов</a>
+<a href="#interactive" class="nav-item">Тесты и задания</a>
+<a href="#protection" class="nav-item">Меры защиты</a>
+<a href="#about" class="nav-item">О проекте</a>
+</nav>
+
+<div class="content-grid">
+<div class="card">
+<h2>📌 Что такое компьютерный вирус?</h2>
+<p>Компьютерный вирус — это вид вредоносного программного обеспечения, способный к самовоспроизведению и внедрению в код других программ, системные области памяти, загрузочные секторы, а также к созданию своих копий.</p>
+<p>Вирусы могут выполнять различные вредоносные действия: повреждать файлы, красть конфиденциальную информацию, замедлять работу системы и даже выводить из строя оборудование.</p>
+</div>
+
+<div class="card">
+<h2>⚠️ Основные пути заражения</h2>
+<ul>
+<li><strong>Электронная почта:</strong> Открытие зараженных вложений</li>
+<li><strong>Интернет:</strong> Скачивание файлов с ненадежных сайтов</li>
+<li><strong>Съемные носители:</strong> Использование зараженных флешек и дисков</li>
+<li><strong>Пиратское ПО:</strong> Установка нелицензионного программного обеспечения</li>
+<li><strong>Социальная инженерия:</strong> Переход по подозрительными ссылкам</li>
+<li><strong>Уязвимости ПО:</strong> Эксплуатация дыр в операционных системах и приложениях</li>
+</ul>
+</div>
+
+<div id="classification" class="card classification-container">
+<h2>🏷️ Классификации компьютерных вирусов</h2>
+<p>Нажмите на классификацию для просмотра типов вирусов. Нажмите на тип вируса для перехода к его описанию:</p>
+<div class="classification-grid">
+<div class="classification-card" data-classification="environment">
+<h3>По среде обитания</h3>
+<p>Где вирус живет и как перемещается</p>
+<div class="classification-dropdown">
+<div class="dropdown-content">
+<!-- СЕТЕВЫЕ ВИРУСЫ: переходят к worm -->
+<div class="dropdown-item" onclick="scrollToVirus('worm')">
+<h4>🌐 Сетевые вирусы</h4>
+<p>Распространяются по компьютерным сетям</p>
+</div>
+<!-- МАКРОВИРУСЫ: переходят к macro -->
+<div class="dropdown-item" onclick="scrollToVirus('macro')">
+<h4>📄 Макровирусы</h4>
+<p>Внедряются в документы через макросы</p>
+</div>
+<!-- ФАЙЛОВЫЕ ВИРУСЫ: нет соответствующего типа - показываем сообщение -->
+<div class="dropdown-item" onclick="showVirusNotAvailable('Файловые вирусы')">
+<h4>📁 Файловые вирусы</h4>
+<p>Заражают исполняемые файлы (.exe, .com)</p>
+</div>
+<!-- ЗАГРУЗОЧНЫЕ ВИРУСЫ: нет соответствующего типа - показываем сообщение -->
+<div class="dropdown-item" onclick="showVirusNotAvailable('Загрузочные вирусы')">
+<h4>💾 Загрузочные вирусы</h4>
+<p>Заражают загрузочные секторы дисков</p>
+</div>
+</div>
+<a href="classob.html" class="classification-details-link" onclick="event.stopPropagation();">📖 Подробнее о классификации →</a>
+</div>
+</div>
+
+<div class="classification-card" data-classification="danger">
+<h3>По уровню опасности</h3>
+<p>Насколько вирус вреден и разрушителен</p>
+<div class="classification-dropdown">
+<div class="dropdown-content">
+<!-- ОПАСНЫЕ ВИРУСЫ: нет соответствующего типа - показываем сообщение -->
+<div class="dropdown-item" onclick="showVirusNotAvailable('Опасные вирусы')">
+<h4>💰 Опасные вирусы</h4>
+<p>Могут повредить данные и систему</p>
+</div>
+<!-- КРИТИЧЕСКИЕ ВИРУСЫ: переходят к ransomware -->
+<div class="dropdown-item" onclick="scrollToVirus('ransomware')">
+<h4>🔥 Критические вирусы</h4>
+<p>Выводят систему из строя полностью</p>
+</div>
+<!-- РАНСОМИЗАТОРЫ: переходят к ransomware -->
+<div class="dropdown-item" onclick="scrollToVirus('ransomware')">
+<h4>⚠️ Рансомизаторы</h4>
+<p>Шифруют данные и требуют выкуп</p>
+</div>
+</div>
+<a href="classop.html" class="classification-details-link" onclick="event.stopPropagation();">📖 Подробнее о классификации →</a>
+</div>
+</div>
+
+<div class="classification-card" data-classification="masking">
+<h3>По технологии маскировки</h3>
+<p>Как вирус прячется от антивирусов</p>
+<div class="classification-dropdown">
+<div class="dropdown-content">
+<!-- РУТКИТЫ: переходят к rootkit -->
+<div class="dropdown-item" onclick="scrollToVirus('rootkit')">
+<h4>🎭 Руткиты</h4>
+<p>Маскируются на уровне ядра ОС</p>
+</div>
+<!-- СТЕЛС-ВИРУСЫ: нет соответствующего типа - показываем сообщение -->
+<div class="dropdown-item" onclick="showVirusNotAvailable('Стелс-вирусы')">
+<h4>👻 Стелс-вирусы</h4>
+<p>Скрывают факт своего присутствия</p>
+</div>
+<!-- ШИФРУЮЩИЕСЯ ВИРУСЫ: нет соответствующего типа - показываем сообщение -->
+<div class="dropdown-item" onclick="showVirusNotAvailable('Шифрующиеся вирусы')">
+<h4>🔒 Шифрующиеся вирусы</h4>
+<p>Шифруют свой код для скрытия</p>
+</div>
+<!-- МЕТАМОРФНЫЕ ВИРУСЫ: нет соответствующего типа - показываем сообщение -->
+<div class="dropdown-item" onclick="showVirusNotAvailable('Метаморфные вирусы')">
+<h4>🔄 Метаморфные вирусы</h4>
+<p>Изменяют свой код при каждом заражении</p>
+</div>
+</div>
+<a href="classtm.html" class="classification-details-link" onclick="event.stopPropagation();">📖 Подробнее о классификации →</a>
+</div>
+</div>
+
+<div class="classification-card" data-classification="algorithm">
+<h3>По алгоритму работы</h3>
+<p>Как вирус действует внутри системы</p>
+<div class="classification-dropdown">
+<div class="dropdown-content">
+<!-- РЕЗИДЕНТНЫЕ ВИРУСЫ: переходят к trojan -->
+<div class="dropdown-item" onclick="scrollToVirus('trojan')">
+<h4>🕵️‍♂️ Резидентные вирусы</h4>
+<p>Постоянно находятся в памяти</p>
+</div>
+<!-- НЕРЕЗИДЕНТНЫЕ ВИРУСЫ: нет соответствующего типа - показываем сообщение -->
+<div class="dropdown-item" onclick="showVirusNotAvailable('Нерезидентные вирусы')">
+<h4>⚡ Нерезидентные вирусы</h4>
+<p>Выполняются и завершаются</p>
+</div>
+<!-- ПОЛИМОРФНЫЕ ВИРУСЫ: нет соответствующего типа - показываем сообщение -->
+<div class="dropdown-item" onclick="showVirusNotAvailable('Полиморфные вирусы')">
+<h4>🔄 Полиморфные вирусы</h4>
+<p>Изменяются при каждом запуске</p>
+</div>
+<!-- SPYWARE: отдельный тип вируса -->
+<div class="dropdown-item" onclick="scrollToVirus('spyware')">
+<h4>👁️ Spyware (Шпионское ПО)</h4>
+<p>Тайно собирают информацию о пользователе</p>
+</div>
+</div>
+<a href="classar.html" class="classification-details-link" onclick="event.stopPropagation();">📖 Подробнее о классификации →</a>
+</div>
+</div>
+</div>
+</div>
+
+<div id="virus-types" class="card virus-types-container">
+<h2>🔍 Типы компьютерных вирусов</h2>
+<p>Вирусы разделены по классификациям. Каждый вирус относится только к одной основной классификации:</p>
+
+<!-- Секция 1: По среде обитания -->
+<div id="environment-section" class="virus-classification-section">
+<h3>По среде обитания</h3>
+<div class="virus-types-grid">
+<div class="virus-card" data-classification="environment" id="virus-worm">
+<h4>Компьютерные черви (Worms) <span class="virus-type-badge">Сетевые вирусы</span></h4>
+<span class="virus-class">Классификация: По среде обитания</span>
+<p>Самостоятельно распространяются по сетям, используя уязвимости. Не требуют вмешательства пользователя для распространения.</p>
+<p><strong>Пример:</strong> ILOVEYOU, Code Red, Blaster</p>
+<a href="worm.html" class="virus-link">📖 Подробнее и задания →</a>
+</div>
+
+<div class="virus-card" data-classification="environment" id="virus-macro">
+<h4>Макровирусы <span class="virus-type-badge">Макровирусы</span></h4>
+<span class="virus-class">Классификация: По среде обитания</span>
+<p>Внедряются в документы Office через макросы. Распространяются через зараженные документы Word, Excel, PowerPoint.</p>
+<p><strong>Пример:</strong> Melissa, Bablas, Marker</p>
+<a href="macro.html" class="virus-link">📖 Подробнее и задания →</a>
+</div>
+</div>
+</div>
+
+<!-- Секция 2: По уровню опасности -->
+<div id="danger-section" class="virus-classification-section">
+<h3>По уровню опасности</h3>
+<div class="virus-types-grid">
+<div class="virus-card" data-classification="danger" id="virus-ransomware">
+<h4>Рансомизаторы (Ransomware) <span class="virus-type-badge">Критические вирусы</span></h4>
+<span class="virus-class">Классификация: По уровню опасности</span>
+<p>Шифруют файлы пользователя и требуют выкуп за расшифровку. Один из самых опасных и прибыльных типов вирусов.</p>
+<p><strong>Пример:</strong> WannaCry, Petya, CryptoLocker</p>
+<a href="ransomware.html" class="virus-link">📖 Подробнее и задания →</a>
+</div>
+</div>
+</div>
+
+<!-- Секция 3: По технологии маскировки -->
+<div id="masking-section" class="virus-classification-section">
+<h3>По технологии маскировки</h3>
+<div class="virus-types-grid">
+<div class="virus-card" data-classification="masking" id="virus-rootkit">
+<h4>Руткиты (Rootkits) <span class="virus-type-badge">Руткиты</span></h4>
+<span class="virus-class">Классификация: По технологии маскировки</span>
+<p>Маскируют свое присутствие в системе на уровне ядра ОС. Предоставляют полный контроль над компьютером.</p>
+<p><strong>Пример:</strong> TDSS, ZeroAccess, Sony BMG</p>
+<a href="rootkit.html" class="virus-link">📖 Подробнее и задания →</a>
+</div>
+</div>
+</div>
+
+<!-- Секция 4: По алгоритму работы -->
+<div id="algorithm-section" class="virus-classification-section">
+<h3>По алгоритму работы</h3>
+<div class="virus-types-grid">
+<div class="virus-card" data-classification="algorithm" id="virus-trojan">
+<h4>Троянские программы (Trojans) <span class="virus-type-badge">Трояны</span></h4>
+<span class="virus-class">Классификация: По алгоритму работы</span>
+<p>Вредоносные программы, маскирующиеся под легитимное ПО. Не самовоспроизводятся, но создают бэкдоры для удаленного доступа.</p>
+<p><strong>Пример:</strong> Zeus, Back Orifice, NetBus</p>
+<a href="trojan.html" class="virus-link">📖 Подробнее и задания →</a>
+</div>
+
+<div class="virus-card" data-classification="algorithm" id="virus-spyware">
+<h4>Spyware (Шпионское ПО) <span class="virus-type-badge">Spyware</span></h4>
+<span class="virus-class">Классификация: По алгоритму работы</span>
+<p>Тайно собирают информацию о пользователе: пароли, банковские данные, историю просмотров. Часто распространяются через нелегальное ПО.</p>
+<p><strong>Пример:</strong> Keyloggers, Adware, Tracking Cookies</p>
+<a href="spyware.html" class="virus-link">📖 Подробнее и задания →</a>
+</div>
+</div>
+</div>
+</div>
+
+<div id="interactive" class="interactive-container">
+<div class="card">
+<h3>🎯 Быстрый тест: Определи вирус</h3>
+<p>Прочитайте описание ситуации и определите тип вируса:</p>
+<div style="background: #f8fbff; padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
+<p style="font-style: italic;">"После открытия вложения в письме от неизвестного отправителя, все мои документы и фотографии изменили расширение на .locked. На рабочем столе появилось сообщение с требованием заплатить 500$ в биткоинах для расшифровки файлов."</p>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+<button onclick="checkAnswer('ransomware')" style="background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">Ransomware</button>
+<button onclick="checkAnswer('trojan')" style="background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">Троян</button>
+<button onclick="checkAnswer('worm')" style="background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">Червь</button>
+<button onclick="checkAnswer('spyware')" style="background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">Spyware</button>
+</div>
+<div id="testResult" style="margin-top: 1.5rem; padding: 1.5rem; border-radius: 10px; display: none;"></div>
+</div>
+
+<div class="card">
+<h3>📊 Статистика киберугроз</h3>
+<div style="margin: 1.5rem 0;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+<span>Трояны</span>
+<span style="font-weight: bold; color: var(--primary);">51%</span>
+</div>
+<div style="height: 20px; background: #e6f2ff; border-radius: 10px; overflow: hidden; margin-bottom: 1rem;">
+<div style="height: 100%; width: 51%; background: var(--primary);"></div>
+</div>
+
+<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+<span>Ransomware</span>
+<span style="font-weight: bold; color: var(--primary);">27%</span>
+</div>
+<div style="height: 20px; background: #e6f2ff; border-radius: 10px; overflow: hidden; margin-bottom: 1rem;">
+<div style="height: 100%; width: 27%; background: var(--primary);"></div>
+</div>
+
+<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+<span>Черви</span>
+<span style="font-weight: bold; color: var(--primary);">15%</span>
+</div>
+<div style="height: 20px; background: #e6f2ff; border-radius: 10px; overflow: hidden; margin-bottom: 1rem;">
+<div style="height: 100%; width: 15%; background: var(--primary);"></div>
+</div>
+
+<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+<span>Другие</span>
+<span style="font-weight: bold; color: var(--primary);">7%</span>
+</div>
+<div style="height: 20px; background: #e6f2ff; border-radius: 10px; overflow: hidden;">
+<div style="height: 100%; width: 7%; background: var(--primary);"></div>
+</div>
+</div>
+<p style="font-size: 0.9rem; color: #666;">Данные за 2025 год. Трояны остаются самым распространенным типом вредоносного ПО.</p>
+</div>
+</div>
+
+<div id="protection" class="card protection-container">
+<h2>🛡️ Комплексные меры защиты</h2>
+<p>Запомните эти ключевые правила кибербезопасности:</p>
+<div class="protection-grid">
+<div class="protection-card">
+<h4>📁 Резервное копирование</h4>
+<p>Регулярно создавайте резервные копии важных данных по правилу 3-2-1 (3 копии, на 2 разных носителях, 1 в другом месте).</p>
+</div>
+<div class="protection-card">
+<h4>🔒 Антивирусная защита</h4>
+<p>Используйте современные антивирусные решения с проактивной защитой и регулярно обновляйте базы вирусных сигнатур.</p>
+</div>
+<div class="protection-card">
+<h4>⚡ Обновления системы</h4>
+<p>Своевременно устанавливайте обновления ОС и приложений. Большинство атак используют известные уязвимости.</p>
+</div>
+<div class="protection-card">
+<h4>👁️ Бдительность</h4>
+<p>Не открывайте подозрительные письма, не переходите по сомнительным ссылкам и не скачивайте файлы с непроверенных сайтов.</p>
+</div>
+</div>
+</div>
+</div>
+
+<footer id="about">
+<div class="footer-content">
+<div>
+<h3 style="color: #80d8ff; margin-bottom: 1.5rem; font-size: 1.2rem;">О проекте</h3>
+<p style="color: #e1f5fe;">Образовательный ресурс, созданный для изучения компьютерных вирусов, их классификаций и методов защиты. Проект предназначен для учащихся и всех, кто интересуется кибербезопасностью.</p>
+</div>
+<div>
+<h3 style="color: #80d8ff; margin-bottom: 1.5rem; font-size: 1.2rem;">Классификации</h3>
+<ul style="list-style-type: none;">
+<li style="margin-bottom: 0.8rem;"><a href="classification-environment.html" style="color: #e1f5fe; text-decoration: none; transition: color 0.3s ease;">По среде обитания</a></li>
+<li style="margin-bottom: 0.8rem;"><a href="classification-danger.html" style="color: #e1f5fe; text-decoration: none; transition: color 0.3s ease;">По уровню опасности</a></li>
+<li style="margin-bottom: 0.8rem;"><a href="classification-masking.html" style="color: #e1f5fe; text-decoration: none; transition: color 0.3s ease;">По технологии маскировки</a></li>
+<li style="margin-bottom: 0.8rem;"><a href="classification-algorithm.html" style="color: #e1f5fe; text-decoration: none; transition: color 0.3s ease;">По алгоритму работы</a></li>
+</ul>
+</div>
+<div>
+<h3 style="color: #80d8ff; margin-bottom: 1.5rem; font-size: 1.2rem;">Ресурсы</h3>
+<ul style="list-style-type: none;">
+<li style="margin-bottom: 0.8rem;"><a href="#" style="color: #e1f5fe; text-decoration: none; transition: color 0.3s ease;">Антивирусные решения</a></li>
+<li style="margin-bottom: 0.8rem;"><a href="#" style="color: #e1f5fe; text-decoration: none; transition: color 0.3s ease;">Базы знаний о вирусах</a></li>
+<li style="margin-bottom: 0.8rem;"><a href="#" style="color: #e1f5fe; text-decoration: none; transition: color 0.3s ease;">Форум по безопасности</a></li>
+<li style="margin-bottom: 0.8rem;"><a href="#" style="color: #e1f5fe; text-decoration: none; transition: color 0.3s ease;">Курсы по кибербезопасности</a></li>
+</ul>
+</div>
+<div>
+<h3 style="color: #80d8ff; margin-bottom: 1.5rem; font-size: 1.2rem;">Контакты</h3>
+<ul style="list-style-type: none;">
+<li style="margin-bottom: 0.8rem; color: #e1f5fe;">📧 Email: info@virus-study.ru</li>
+<li style="margin-bottom: 0.8rem; color: #e1f5fe;">📞 Телефон: +7 676 767 6767</li>
+<li style="margin-bottom: 0.8rem; color: #e1f5fe;">🏢 Адрес: Москва, ул. Кибербезопасности, 15</li>
+<li style="color: #e1f5fe;">🕐 Время работы: Пн-Пт, 9:00-18:00</li>
+</ul>
+</div>
+</div>
+<div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #4a9eff; color: #80d8ff; font-size: 0.9rem;">
+<p>&copy; 2026 Образовательный проект "Компьютерные вирусы: от А до Я". Все права защищены.</p>
+<p style="margin-top: 0.5rem;">Материалы предназначены для образовательных целей.</p>
+</div>
+</footer>
+</div>
+
+<script>
+// Инициализация переменных
+let activeCard = null;
+let highlightedVirus = null;
+
+// Функция для переключения выпадающего меню с плавной анимацией
+function toggleDropdown(event) {
+    const card = event.currentTarget;
+    const dropdown = card.querySelector('.classification-dropdown');
+    
+    // Если уже активна - закрываем
+    if (card === activeCard) {
+        card.classList.remove('active');
+        dropdown.style.maxHeight = '0';
+        activeCard = null;
+        return;
+    }
+    
+    // Закрываем все другие открытые dropdown
+    if (activeCard) {
+        activeCard.classList.remove('active');
+        const activeDropdown = activeCard.querySelector('.classification-dropdown');
+        if (activeDropdown) {
+            activeDropdown.style.maxHeight = '0';
+        }
+    }
+    
+    // Открываем текущий
+    card.classList.add('active');
+    dropdown.style.maxHeight = dropdown.scrollHeight + 'px';
+    activeCard = card;
+    
+    // Прокручиваем к карточке, если она не полностью видна
+    const rect = card.getBoundingClientRect();
+    if (rect.top < 100) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Улучшенная функция для прокрутки к вирусу с подсветкой
+function scrollToVirus(virusType) {
+    const virusId = 'virus-' + virusType;
+    const targetElement = document.getElementById(virusId);
+    
+    if (targetElement) {
+        // Закрываем все открытые dropdown
+        if (activeCard) {
+            activeCard.classList.remove('active');
+            const dropdown = activeCard.querySelector('.classification-dropdown');
+            if (dropdown) {
+                dropdown.style.maxHeight = '0';
+            }
+            activeCard = null;
+        }
+        
+        // Находим родительскую секцию вируса
+        const virusSection = targetElement.closest('.virus-classification-section');
+        
+        // Прокручиваем к секции вируса
+        if (virusSection) {
+            virusSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }
+        
+        // Добавляем небольшую задержку для плавности
+        setTimeout(() => {
+            // Снимаем подсветку с предыдущего вируса
+            if (highlightedVirus) {
+                highlightedVirus.classList.remove('highlighted');
+            }
+            
+            // Прокручиваем к самому вирусу
+            targetElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            
+            // Подсвечиваем карточку вируса
+            targetElement.classList.add('highlighted');
+            highlightedVirus = targetElement;
+            
+            // Обновляем активный пункт меню
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.nav-item[href="#virus-types"]').classList.add('active');
+            
+            // Создаем эффект пульсации
+            let pulseCount = 0;
+            const pulseInterval = setInterval(() => {
+                if (pulseCount < 3) {
+                    targetElement.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        targetElement.style.transform = 'scale(1)';
+                    }, 200);
+                    pulseCount++;
+                } else {
+                    clearInterval(pulseInterval);
+                }
+            }, 800);
+            
+            // Убираем подсветку через 5 секунды
+            setTimeout(() => {
+                if (highlightedVirus === targetElement) {
+                    targetElement.classList.remove('highlighted');
+                    highlightedVirus = null;
+                }
+            }, 5000);
+        }, 300);
+    } else {
+        alert('Информация о данном типе вируса будет добавлена в ближайшее время!');
+    }
+}
+
+// Функция: Показать сообщение, что вирус не доступен
+function showVirusNotAvailable(virusName) {
+    alert(`Информация о "${virusName}" будет добавлена в ближайшее время!\n\nСейчас вы можете изучить доступные типы вирусов:` + 
+          '\n\n• Компьютерные черви (Worms)' +
+          '\n• Макровирусы' +
+          '\n• Рансомизаторы (Ransomware)' +
+          '\n• Руткиты (Rootkits)' +
+          '\n• Троянские программы (Trojans)' +
+          '\n• Spyware (Шпионское ПО)');
+}
+
+// Функция для прокрутки к секции классификации
+function scrollToClassificationSection(classification) {
+    const sectionId = classification + '-section';
+    const targetSection = document.getElementById(sectionId);
+    
+    if (targetSection) {
+        // Закрываем все открытые dropdown
+        if (activeCard) {
+            activeCard.classList.remove('active');
+            const dropdown = activeCard.querySelector('.classification-dropdown');
+            if (dropdown) {
+                dropdown.style.maxHeight = '0';
+            }
+            activeCard = null;
+        }
+        
+        // Прокручиваем к секции
+        targetSection.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+        
+        // Обновляем активный пункт меню
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector('.nav-item[href="#virus-types"]').classList.add('active');
+        
+        // Подсвечиваем все вирусы в этой секции
+        document.querySelectorAll('.virus-card').forEach(card => {
+            card.classList.remove('highlighted');
+            if (card.getAttribute('data-classification') === classification) {
+                card.classList.add('highlighted');
+            }
+        });
+        
+        // Убираем подсветку через 5 секунд
+        setTimeout(() => {
+            document.querySelectorAll('.virus-card').forEach(card => {
+                card.classList.remove('highlighted');
+            });
+        }, 5000);
+    }
+}
+
+// Инициализация обработчиков событий
+document.addEventListener('DOMContentLoaded', function() {
+    // Добавляем обработчики для карточек классификации
+    document.querySelectorAll('.classification-card').forEach(card => {
+        card.addEventListener('click', toggleDropdown);
+    });
+    
+    // Инициализируем высоту dropdown
+    document.querySelectorAll('.classification-dropdown').forEach(dropdown => {
+        dropdown.style.maxHeight = '0';
+    });
+    
+    // Добавляем обработчики для заголовков классификаций (для перехода к секции)
+    document.querySelectorAll('.classification-card h3').forEach(header => {
+        header.addEventListener('click', function(event) {
+            const card = this.closest('.classification-card');
+            const classification = card.getAttribute('data-classification');
+            
+            // Если dropdown открыт, переходим к секции вирусов
+            if (card.classList.contains('active')) {
+                event.stopPropagation();
+                scrollToClassificationSection(classification);
+            }
+        });
+    });
+});
+
+// Функция для теста
+function checkAnswer(answer) {
+    const resultElement = document.getElementById('testResult');
+    if (answer === 'ransomware') {
+        resultElement.innerHTML = `
+        <div style="background: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; border-left: 5px solid #28a745;">
+        ✅ <strong>Правильно!</strong> Это ransomware (рансомизатор) - вирус, который шифрует файлы и требует выкуп за их расшифровку.
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.9rem;"><strong>Классификация:</strong> По уровню опасности</p>
+        <p style="font-size: 0.9rem;"><strong>Тип вируса:</strong> Критические вирусы / Рансомизаторы</p>
+        <p style="font-size: 0.9rem;">Рекомендации: Не платите выкуп, отключите компьютер от сети, используйте антивирусные утилиты для восстановления файлов или восстановите данные из резервной копии.</p>
+        `;
+    } else {
+        resultElement.innerHTML = `
+        <div style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; border-left: 5px solid #dc3545;">
+        ❌ <strong>Неверно.</strong> Это ransomware (рансомизатор). Основные признаки: шифрование файлов и требование выкупа.
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.9rem;"><strong>Классификация:</strong> По уровню опасности</p>
+        <p style="font-size: 0.9rem;"><strong>Тип вируса:</strong> Критические вирусы / Рансомизаторы</p>
+        <p style="font-size: 0.9rem;">Трояны маскируются под легитимное ПО (алгоритм работы), черви самостоятельно распространяются по сети (среда обитания), а spyware тайно собирает информацию (алгоритм работы).</p>
+        `;
+    }
+    resultElement.style.display = 'block';
+}
+
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+// Закрытие dropdown при клике вне его
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.classification-card') && 
+        !event.target.closest('.classification-dropdown') &&
+        activeCard) {
+        activeCard.classList.remove('active');
+        const dropdown = activeCard.querySelector('.classification-dropdown');
+        if (dropdown) {
+            dropdown.style.maxHeight = '0';
+        }
+        activeCard = null;
+    }
+});
+
+// Плавная прокрутка к якорям
+document.querySelectorAll('.nav-item').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+            window.scrollTo({
+                top: targetElement.offsetTop - 80,
+                behavior: 'smooth'
+            });
+            
+            // Обновляем активный пункт меню
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            this.classList.add('active');
+        }
+    });
+});
+
+// Подсветка активного пункта меню при прокрутке
+window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('.card, .virus-classification-section');
+    const navItems = document.querySelectorAll('.nav-item');
+    let currentSectionId = '';
+    
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 100;
+        if (window.scrollY >= sectionTop) {
+            currentSectionId = section.id;
+        }
+    });
+    
+    navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('href') === `#${currentSectionId}`) {
+            item.classList.add('active');
+        }
+    });
+});
+
+// Функция для подсветки вирусов по классификации
+function highlightVirusesByClassification(classification) {
+    document.querySelectorAll('.virus-card').forEach(card => {
+        card.classList.remove('highlighted');
+        if (card.getAttribute('data-classification') === classification) {
+            card.classList.add('highlighted');
+        }
+    });
+}
+
+// Добавляем обработчики для карточек классификации для подсветки соответствующих вирусов
+document.querySelectorAll('.classification-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        const classification = this.getAttribute('data-classification');
+        highlightVirusesByClassification(classification);
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        document.querySelectorAll('.virus-card').forEach(card => {
+            card.classList.remove('highlighted');
+        });
+    });
+});
+</script>
+</body>
+</html>
